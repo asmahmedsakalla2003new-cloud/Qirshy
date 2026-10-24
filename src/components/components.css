@@ -9,6 +9,7 @@
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   font-weight: var(--font-weight-semibold);
+  text-decoration: none;
   cursor: pointer;
   transition:
     background-color var(--duration-fast) var(--ease-out),
@@ -77,6 +78,11 @@
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
+}
+
+/* حقول المبالغ: اتجاه أرقام من اليسار لليمين (لتظهر الإشارة السالبة في مكانها) مع محاذاة عربية. */
+.field__input[dir='ltr'] {
+  text-align: right;
 }
 
 .field__input:focus-visible {
@@ -151,4 +157,100 @@
 
 .empty-state__action {
   margin-block-start: var(--space-3);
+}
+
+.btn--danger-text {
+  color: var(--color-danger);
+}
+.btn--danger-text:hover:not(:disabled) {
+  background: var(--color-danger-soft);
+}
+
+/* ===== مجموعة الاختيار ===== */
+.choice-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.choice-group legend {
+  padding: 0;
+  margin-block-end: var(--space-2);
+}
+
+.choice-group__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.choice {
+  position: relative;
+}
+
+.choice input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.choice__label {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  padding-inline: var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.choice input:checked + .choice__label {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.choice input:focus-visible + .choice__label {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ===== نافذة التأكيد ===== */
+.dialog {
+  inline-size: min(100% - 2 * var(--space-4), 420px);
+  padding: var(--space-5);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-md);
+}
+
+.dialog::backdrop {
+  background: rgb(15 23 42 / 0.5);
+}
+
+.dialog__title {
+  font-size: var(--font-size-lg);
+  margin-block-end: var(--space-2);
+}
+
+.dialog__body {
+  color: var(--color-text-muted);
+  margin-block-end: var(--space-5);
+}
+
+.dialog__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dialog__actions .btn {
+  flex: 1;
 }

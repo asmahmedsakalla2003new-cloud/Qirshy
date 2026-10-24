@@ -1,4 +1,3 @@
-import { Link } from 'react-router'
 import { EmptyState } from '../components/EmptyState'
 
 /*
@@ -37,21 +36,6 @@ export function BudgetsScreen() {
         title="لم تُحدَّد ميزانية بعد"
         description="ستتمكن من تحديد ميزانية شهرية عامة وميزانية لكل فئة، مع تنبيه عند الاقتراب منها."
       />
-    </>
-  )
-}
-
-export function SettingsScreen() {
-  return (
-    <>
-      <h1 className="page-title">الإعدادات</h1>
-      <EmptyState
-        title="الإعدادات قيد الإنشاء"
-        description="ستجد هنا إنشاء نسخة احتياطية واستعادتها، وإعدادات العملات والفئات."
-      />
-      <p className="dev-link">
-        <Link to="/design">معاينة نظام التصميم</Link>
-      </p>
     </>
   )
 }

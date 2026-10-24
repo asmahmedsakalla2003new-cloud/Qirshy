@@ -7,6 +7,10 @@ const paths = {
   offline: 'M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0M12 19h.01',
   shield: 'M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z',
   coins: 'M9 14a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm6.5-9.7A6 6 0 1 1 9.3 15.5',
+  bank: 'M3 10h18M12 3l9 5H3zM5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18',
+  phone: 'M7 2h10a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm4 17h2',
+  plus: 'M12 5v14M5 12h14',
+  chevron: 'M15 6l-6 6 6 6',
 } as const
 
 export type IconName = keyof typeof paths

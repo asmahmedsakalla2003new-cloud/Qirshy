@@ -1,9 +1,10 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Alert } from '../../components/Alert'
 import { Button } from '../../components/Button'
 import { Icon, type IconName } from '../../components/Icon'
 import { Logo } from '../../components/Logo'
-import { completeOnboarding } from '../../core/preferences'
+import { completeOnboarding } from '../../data/settingsRepo'
 
 const highlights: { icon: IconName; title: string; text: string }[] = [
   { icon: 'coins', title: 'شيكل ودولار', text: 'سجّل مصاريفك ودخلك بالعملتين، وكل عملة تُحسب وحدها.' },
@@ -13,10 +14,15 @@ const highlights: { icon: IconName; title: string; text: string }[] = [
 
 export function WelcomeScreen() {
   const navigate = useNavigate()
+  const [failed, setFailed] = useState(false)
 
-  function start() {
-    completeOnboarding()
-    navigate('/', { replace: true })
+  async function start() {
+    try {
+      await completeOnboarding()
+      navigate('/', { replace: true })
+    } catch {
+      setFailed(true)
+    }
   }
 
   return (
@@ -44,6 +50,12 @@ export function WelcomeScreen() {
       <Alert tone="info" title="احفظ نسخة احتياطية بانتظام">
         بياناتك محفوظة في هذا المتصفح فقط. إذا مسحت بيانات المتصفح ستُحذف، لذا أنشئ نسخة احتياطية من الإعدادات واحتفظ بها في مكان آمن.
       </Alert>
+
+      {failed && (
+        <Alert tone="danger" title="تعذّر الحفظ">
+          لم نتمكن من حفظ الإعداد على هذا الجهاز. حاول مرة أخرى.
+        </Alert>
+      )}
 
       <Button size="lg" fullWidth onClick={start}>
         ابدأ الآن

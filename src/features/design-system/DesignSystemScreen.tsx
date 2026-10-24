@@ -66,6 +66,7 @@ export function DesignSystemScreen() {
           <TextField
             label="المبلغ"
             inputMode="decimal"
+            dir="ltr"
             placeholder="0.00"
             hint="بالشيكل"
             value={amount}
@@ -74,7 +75,7 @@ export function DesignSystemScreen() {
             error={amountError}
           />
           <TextField label="الوصف" hint="اختياري" />
-          <TextField label="حقل فيه خطأ" defaultValue="-5" error="يجب أن يكون المبلغ أكبر من صفر." />
+          <TextField label="حقل فيه خطأ" dir="ltr" defaultValue="-5" error="يجب أن يكون المبلغ أكبر من صفر." />
         </div>
       </Card>
 
