@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="16" fill="#312e81"/>
+  <circle cx="32" cy="32" r="20" fill="#059669"/>
+  <circle cx="32" cy="32" r="16" fill="none" stroke="#d1fae5" stroke-width="1.5" opacity="0.6"/>
+  <text x="32" y="30" text-anchor="middle" dominant-baseline="central"
+    font-family="Cairo" font-weight="700" font-size="22" fill="#ffffff">ق</text>
+</svg>

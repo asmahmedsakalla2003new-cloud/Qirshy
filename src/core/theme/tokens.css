@@ -1,0 +1,132 @@
+/*
+ * متغيرات التصميم لتطبيق قِرْش.
+ * الهوية: زمردي (الإجراءات والقيم الإيجابية) ونيلي (الهوية والعناوين).
+ * المسافات على شبكة 4/8 بكسل. استخدم الخصائص المنطقية (inline/block) ليعمل RTL تلقائياً.
+ */
+:root {
+  color-scheme: light;
+
+  /* الألوان الخام */
+  --emerald-50: #ecfdf5;
+  --emerald-100: #d1fae5;
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+  --emerald-800: #065f46;
+  --indigo-50: #eef2ff;
+  --indigo-100: #e0e7ff;
+  --indigo-700: #4338ca;
+  --indigo-800: #3730a3;
+  --indigo-900: #312e81;
+
+  /* الألوان الدلالية */
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f5f9;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-border: #e2e8f0;
+  --color-border-strong: #94a3b8;
+
+  --color-primary: var(--emerald-700);
+  --color-primary-hover: var(--emerald-800);
+  --color-primary-soft: var(--emerald-50);
+  --color-on-primary: #ffffff;
+
+  --color-brand: var(--indigo-900);
+  --color-brand-soft: var(--indigo-50);
+  --color-on-brand: #ffffff;
+
+  --color-danger: #b91c1c;
+  --color-on-danger: #ffffff;
+  --color-danger-soft: #fef2f2;
+  --color-warning: #b45309;
+  --color-warning-soft: #fffbeb;
+  --color-success: var(--emerald-700);
+  --color-success-soft: var(--emerald-50);
+
+  --color-focus: var(--indigo-700);
+
+  /* الخط */
+  --font-family: 'Cairo Variable', 'Segoe UI', Tahoma, system-ui, sans-serif;
+  --font-size-xs: 0.75rem;   /* 12 */
+  --font-size-sm: 0.875rem;  /* 14 */
+  --font-size-md: 1rem;      /* 16 */
+  --font-size-lg: 1.125rem;  /* 18 */
+  --font-size-xl: 1.375rem;  /* 22 */
+  --font-size-2xl: 1.75rem;  /* 28 */
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-body: 1.7;
+  --line-height-heading: 1.35;
+
+  /* المسافات */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* الزوايا والظلال */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
+  --shadow-md: 0 4px 12px rgb(15 23 42 / 0.08);
+
+  /* الأبعاد */
+  --touch-target: 48px;
+  --content-max-width: 640px;
+  --nav-height: 64px;
+
+  /* الحركة */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --color-bg: #0b1120;
+    --color-surface: #111827;
+    --color-surface-muted: #1f2937;
+    --color-text: #e5e7eb;
+    --color-text-muted: #9ca3af;
+    --color-border: #1f2937;
+    --color-border-strong: #4b5563;
+
+    --color-primary: #34d399;
+    --color-primary-hover: #6ee7b7;
+    --color-primary-soft: rgb(52 211 153 / 0.12);
+    --color-on-primary: #052e1f;
+
+    --color-brand: #a5b4fc;
+    --color-brand-soft: rgb(165 180 252 / 0.12);
+    --color-on-brand: #1e1b4b;
+
+    --color-danger: #f87171;
+    --color-on-danger: #450a0a;
+    --color-danger-soft: rgb(248 113 113 / 0.12);
+    --color-warning: #fbbf24;
+    --color-warning-soft: rgb(251 191 36 / 0.12);
+    --color-success: #34d399;
+    --color-success-soft: rgb(52 211 153 / 0.12);
+
+    --color-focus: #a5b4fc;
+
+    --shadow-sm: none;
+    --shadow-md: 0 4px 12px rgb(0 0 0 / 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+  }
+}

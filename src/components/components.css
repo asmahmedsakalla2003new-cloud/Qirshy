@@ -1,0 +1,154 @@
+/* ===== الأزرار ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-block-size: var(--touch-target);
+  padding-inline: var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.btn--lg {
+  min-block-size: 56px;
+  font-size: var(--font-size-lg);
+}
+
+.btn--full {
+  inline-size: 100%;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.btn--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+.btn--secondary:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-primary);
+}
+.btn--ghost:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+}
+
+.btn--danger {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== الحقول ===== */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.field__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.field__input {
+  min-block-size: var(--touch-target);
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.field__input:focus-visible {
+  outline-offset: 0;
+  border-color: var(--color-focus);
+}
+
+.field__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.field__error {
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+  font-weight: var(--font-weight-semibold);
+}
+
+.field--error .field__input {
+  border-color: var(--color-danger);
+}
+
+/* ===== البطاقات ===== */
+.card {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===== رسائل الحالة ===== */
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border-inline-start: 4px solid currentColor;
+  font-size: var(--font-size-sm);
+}
+
+.alert__title {
+  font-weight: var(--font-weight-bold);
+  margin-block-end: var(--space-1);
+}
+
+.alert__body {
+  color: var(--color-text);
+}
+
+.alert--info { background: var(--color-brand-soft); color: var(--color-brand); }
+.alert--success { background: var(--color-success-soft); color: var(--color-success); }
+.alert--warning { background: var(--color-warning-soft); color: var(--color-warning); }
+.alert--danger { background: var(--color-danger-soft); color: var(--color-danger); }
+
+/* ===== الحالة الفارغة ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-7) var(--space-4);
+  text-align: center;
+}
+
+.empty-state__title {
+  font-size: var(--font-size-lg);
+}
+
+.empty-state__description {
+  max-inline-size: 36ch;
+  color: var(--color-text-muted);
+}
+
+.empty-state__action {
+  margin-block-start: var(--space-3);
+}
