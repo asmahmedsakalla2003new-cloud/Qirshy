@@ -7,8 +7,7 @@ import { Icon } from '../../components/Icon'
 import { listAccounts } from '../../data/accountsRepo'
 import { getSettings } from '../../data/settingsRepo'
 import { getStorageStatus, type StorageStatus } from '../../data/storage'
-
-const dateFormat = new Intl.DateTimeFormat('ar-u-nu-latn', { dateStyle: 'long', timeStyle: 'short' })
+import { formatDateTime } from '../../domain/dates'
 
 /** صيغة العدد العربية: حساب واحد، حسابان، 3 حسابات، 11 حساباً. */
 function countAccounts(n: number): string {
@@ -68,7 +67,7 @@ export function SettingsScreen() {
             <dt>آخر نسخة احتياطية</dt>
             <dd>
               {settings?.lastBackupAt ? (
-                <bdi>{dateFormat.format(new Date(settings.lastBackupAt))}</bdi>
+                <bdi>{formatDateTime(settings.lastBackupAt)}</bdi>
               ) : (
                 'لم تُنشأ نسخة احتياطية بعد'
               )}

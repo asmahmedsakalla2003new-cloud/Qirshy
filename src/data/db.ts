@@ -1,5 +1,6 @@
 import { Dexie, type EntityTable } from 'dexie'
 import type { Account } from '../domain/accounts'
+import type { Transaction } from '../domain/transactions'
 
 /** إعدادات التطبيق: سجل واحد بالمعرّف 'app'. */
 export type AppSettings = {
@@ -14,6 +15,7 @@ export type AppSettings = {
 export class QirshDB extends Dexie {
   settings!: EntityTable<AppSettings, 'id'>
   accounts!: EntityTable<Account, 'id'>
+  transactions!: EntityTable<Transaction, 'id'>
 
   constructor(name = 'qirsh') {
     super(name)
@@ -27,6 +29,11 @@ export class QirshDB extends Dexie {
     this.version(1).stores({
       settings: 'id',
       accounts: 'id, type, currency',
+    })
+
+    // الإصدار 2 (المرحلة 3): جدول العمليات. لا يغيّر البيانات الموجودة.
+    this.version(2).stores({
+      transactions: 'id, date, accountId, type',
     })
   }
 }

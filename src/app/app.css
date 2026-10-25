@@ -371,3 +371,130 @@ a {
   grid-template-columns: 2fr 1fr;
   gap: var(--space-2);
 }
+
+.money--positive {
+  color: var(--color-success);
+}
+
+.stack--tight {
+  gap: var(--space-3);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.page-header .page-title {
+  margin-block-end: 0;
+}
+
+.row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+/* ===== التصفية ===== */
+.filters {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  padding: var(--space-3) var(--space-4);
+}
+
+.filters > summary {
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  min-block-size: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.filters[open] > summary {
+  margin-block-end: var(--space-3);
+}
+
+/* ===== ملخص العمليات ===== */
+.summary__rows {
+  margin: var(--space-2) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.summary__rows > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.summary__rows dt {
+  color: var(--color-text-muted);
+}
+
+.summary__rows dd {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+.summary__net {
+  padding-block-start: var(--space-1);
+  border-block-start: 1px solid var(--color-border);
+}
+
+/* ===== سجل العمليات ===== */
+.day-group__title {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-block-end: var(--space-2);
+}
+
+.tx-icon--income {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.tx-icon--expense {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+/* ===== تفاصيل العملية ===== */
+.tx-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block: var(--space-6);
+  text-align: center;
+}
+
+.tx-hero__amount {
+  font-size: 2.25rem;
+}
+
+.tx-hero__title {
+  color: var(--color-text-muted);
+}
+
+.tx-badge {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tx-badge--income {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.tx-badge--expense {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}

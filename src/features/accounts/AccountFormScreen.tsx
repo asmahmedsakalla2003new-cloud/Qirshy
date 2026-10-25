@@ -92,7 +92,8 @@ function AccountForm({ account }: { account?: Account }) {
       else await createAccount(input)
       navigate('/settings/accounts', { replace: true })
     } catch (err) {
-      if (err instanceof ValidationError) setErrors(err.errors)
+      if (err instanceof ValidationError && err.errors.name) setErrors({ name: err.errors.name })
+      else if (err instanceof ValidationError) setFormError(err.message)
       else setFormError('تعذّر حفظ الحساب على هذا الجهاز. حاول مرة أخرى.')
     } finally {
       setSaving(false)
@@ -145,7 +146,11 @@ function AccountForm({ account }: { account?: Account }) {
         dir="ltr"
         placeholder="0.00"
         autoComplete="off"
-        hint="المبلغ الموجود في الحساب الآن. اكتب إشارة - قبله إذا كان الحساب مكشوفاً."
+        hint={
+          isEdit
+            ? 'المبلغ الذي كان في الحساب عند إضافته. الرصيد الحالي يُحسب منه ومن العمليات.'
+            : 'المبلغ الموجود في الحساب الآن. اكتب إشارة - قبله إذا كان الحساب مكشوفاً.'
+        }
         value={balance}
         error={errors.balance}
         onChange={(e) => {

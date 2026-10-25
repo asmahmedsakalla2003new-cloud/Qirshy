@@ -11,6 +11,9 @@ const paths = {
   phone: 'M7 2h10a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm4 17h2',
   plus: 'M12 5v14M5 12h14',
   chevron: 'M15 6l-6 6 6 6',
+  arrowDown: 'M12 5v14M6 13l6 6 6-6',
+  arrowUp: 'M12 19V5M6 11l6-6 6 6',
+  search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm9 2-4.3-4.3',
 } as const
 
 export type IconName = keyof typeof paths

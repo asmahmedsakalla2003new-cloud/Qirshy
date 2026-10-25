@@ -1,3 +1,4 @@
+import { signedAmount, type Transaction } from './transactions'
 import type { Currency } from './money'
 
 /**
@@ -53,9 +54,14 @@ export function validateAccount(input: AccountInput, otherAccounts: Pick<Account
 }
 
 /**
- * الرصيد الحالي للحساب. في هذه المرحلة يساوي الرصيد الافتتاحي؛
- * تُضاف إليه العمليات (دخل − مصروف ± تحويلات) في المرحلة 3.
+ * الرصيد الحالي للحساب = الرصيد الافتتاحي + الدخل − المصروف.
+ * (تُضاف التحويلات في المرحلة 6.) transactions: كل العمليات، ويُؤخذ منها ما يخص الحساب.
  */
-export function accountBalance(account: Pick<Account, 'openingBalanceMinor'>): number {
-  return account.openingBalanceMinor
+export function accountBalance(
+  account: Pick<Account, 'id' | 'openingBalanceMinor'>,
+  transactions: Pick<Transaction, 'accountId' | 'type' | 'amountMinor'>[],
+): number {
+  return transactions
+    .filter((t) => t.accountId === account.id)
+    .reduce((balance, t) => balance + signedAmount(t), account.openingBalanceMinor)
 }

@@ -254,3 +254,23 @@
 .dialog__actions .btn {
   flex: 1;
 }
+
+/* ===== القائمة المنسدلة ===== */
+.field__select {
+  appearance: none;
+  padding-inline-end: var(--space-6);
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    left 13px center,
+    left 18px center;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* حقل المبلغ الكبير في نموذج العملية. */
+.field--amount .field__input {
+  min-block-size: 64px;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}

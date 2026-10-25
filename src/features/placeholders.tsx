@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { EmptyState } from '../components/EmptyState'
 
 /*
@@ -10,19 +11,12 @@ export function HomeScreen() {
       <h1 className="page-title">الرئيسية</h1>
       <EmptyState
         title="لا توجد عمليات بعد"
-        description="سيظهر هنا ملخص مصاريفك ودخلك بالشيكل والدولار بعد إضافة أول عملية."
-      />
-    </>
-  )
-}
-
-export function TransactionsScreen() {
-  return (
-    <>
-      <h1 className="page-title">العمليات</h1>
-      <EmptyState
-        title="سجل العمليات فارغ"
-        description="ستظهر هنا المصاريف والدخل والتحويلات، مع البحث والتصفية."
+        description="سيظهر هنا ملخص مصاريفك ودخلك بالشيكل والدولار حسب الفئات."
+        action={
+          <Link to="/transactions" className="btn btn--secondary btn--md">
+            عرض العمليات
+          </Link>
+        }
       />
     </>
   )
