@@ -1,8 +1,8 @@
-import { useId, type InputHTMLAttributes } from 'react'
+import { useId, type InputHTMLAttributes, type ReactNode } from 'react'
 
 type Props = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
   label: string
-  hint?: string
+  hint?: ReactNode
   error?: string
 }
 

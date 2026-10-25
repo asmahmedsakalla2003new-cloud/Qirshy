@@ -13,6 +13,7 @@ import { TextField } from '../../components/TextField'
 import { listAccounts } from '../../data/accountsRepo'
 import { listCategories } from '../../data/categoriesRepo'
 import { listTransactions } from '../../data/transactionsRepo'
+import { listTransfers } from '../../data/transfersRepo'
 import { formatDayHeading, todayISO } from '../../domain/dates'
 import { currencyLabels } from '../../domain/money'
 import {
@@ -21,18 +22,25 @@ import {
   groupByDate,
   sortTransactions,
   summarize,
+  type Transaction,
   type TransactionFilter,
-  type TransactionType,
 } from '../../domain/transactions'
+import { filterTransfers, type Transfer } from '../../domain/transfers'
+import { TransferRow } from '../transfers/TransferRow'
 import { TransactionRow } from './TransactionRow'
 
 const typeOptions = [
   { value: '', label: 'الكل' },
   { value: 'expense', label: 'مصروف' },
   { value: 'income', label: 'دخل' },
+  { value: 'transfer', label: 'تحويل' },
 ] as const
 
 type TypeOption = (typeof typeOptions)[number]['value']
+
+type Entry =
+  | { kind: 'transaction'; date: string; createdAt: string; item: Transaction }
+  | { kind: 'transfer'; date: string; createdAt: string; item: Transfer }
 
 const PARAM_KEYS = { query: 'q', type: 'type', accountId: 'account', categoryId: 'category', from: 'from', to: 'to' } as const
 
@@ -45,7 +53,7 @@ function useUrlFilter() {
   const [params, setParams] = useSearchParams()
   const [filter, setFilterState] = useState<TransactionFilter>(() => ({
     query: params.get('q') ?? '',
-    type: (params.get('type') as TransactionType | null) ?? undefined,
+    type: (params.get('type') as TransactionFilter['type'] | null) ?? undefined,
     accountId: params.get('account') ?? undefined,
     categoryId: params.get('category') ?? undefined,
     from: params.get('from') ?? undefined,
@@ -70,6 +78,7 @@ export function TransactionsScreen() {
   const flash = useFlash()
   const warning = useFlash('warning')
   const transactions = useLiveQuery(listTransactions)
+  const transfers = useLiveQuery(listTransfers)
   const accounts = useLiveQuery(listAccounts)
   const categories = useLiveQuery(listCategories)
   const [filter, setFilter, clearFilter] = useUrlFilter()
@@ -83,9 +92,14 @@ export function TransactionsScreen() {
     [accounts, categories],
   )
 
-  if (!transactions || !accounts || !categories) return null
+  if (!transactions || !transfers || !accounts || !categories) return null
 
   const visible = sortTransactions(filterTransactions(transactions, filter, names))
+  // السجل يضم العمليات والتحويلات معاً، الأحدث أولاً. الملخص للعمليات فقط.
+  const entries: Entry[] = [
+    ...visible.map((t) => ({ kind: 'transaction' as const, date: t.date, createdAt: t.createdAt, item: t })),
+    ...filterTransfers(transfers, filter, names).map((t) => ({ kind: 'transfer' as const, date: t.date, createdAt: t.createdAt, item: t })),
+  ].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
   // فئات النوع المصفّى (أو الكل)، مع المؤرشفة لأنها قد تكون في عمليات قديمة.
   const categoryOptions = categories.filter((c) => !filter.type || c.kind === filter.type)
   const summary = summarize(visible)
@@ -94,10 +108,16 @@ export function TransactionsScreen() {
     <div className="stack">
       <div className="page-header">
         <h1 className="page-title">العمليات</h1>
-        <Link to="/transactions/new" className="btn btn--primary btn--md">
-          <Icon name="plus" size={20} />
-          إضافة عملية
-        </Link>
+        <div className="row-wrap">
+          <Link to="/transfers/new" className="btn btn--secondary btn--md">
+            <Icon name="swap" size={20} />
+            تحويل
+          </Link>
+          <Link to="/transactions/new" className="btn btn--primary btn--md">
+            <Icon name="plus" size={20} />
+            إضافة عملية
+          </Link>
+        </div>
       </div>
 
       {flash && <Alert tone="success">{flash}</Alert>}
@@ -107,7 +127,7 @@ export function TransactionsScreen() {
         </Alert>
       )}
 
-      {transactions.length === 0 ? (
+      {transactions.length === 0 && transfers.length === 0 ? (
         <EmptyState
           title="لا توجد عمليات بعد"
           description="سجّل أول مصروف أو دخل، وسيظهر هنا مع رصيد كل حساب."
@@ -197,7 +217,7 @@ export function TransactionsScreen() {
             </section>
           )}
 
-          {visible.length === 0 ? (
+          {entries.length === 0 ? (
             <EmptyState
               title="لا توجد نتائج"
               description="لا توجد عمليات تطابق البحث أو التصفية الحالية."
@@ -208,17 +228,21 @@ export function TransactionsScreen() {
               }
             />
           ) : (
-            groupByDate(visible).map((group) => (
+            groupByDate(entries).map((group) => (
               <section key={group.date} className="day-group" aria-label={formatDayHeading(group.date)}>
                 <h2 className="day-group__title">{formatDayHeading(group.date)}</h2>
                 <ul className="list">
-                  {group.items.map((t) => (
-                    <li key={t.id}>
-                      <TransactionRow
-                        transaction={t}
-                        accountName={names[t.accountId] ?? '—'}
-                        categoryName={t.categoryId ? names[t.categoryId] : undefined}
-                      />
+                  {group.items.map((entry) => (
+                    <li key={entry.item.id}>
+                      {entry.kind === 'transfer' ? (
+                        <TransferRow transfer={entry.item} names={names} />
+                      ) : (
+                        <TransactionRow
+                          transaction={entry.item}
+                          accountName={names[entry.item.accountId] ?? '—'}
+                          categoryName={entry.item.categoryId ? names[entry.item.categoryId] : undefined}
+                        />
+                      )}
                     </li>
                   ))}
                 </ul>

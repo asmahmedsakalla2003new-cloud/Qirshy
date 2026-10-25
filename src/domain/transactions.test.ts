@@ -67,9 +67,9 @@ describe('accountBalance', () => {
       tx({ type: 'expense', amountMinor: 99 }),
       tx({ type: 'income', amountMinor: 777, accountId: 'bank' }),
     ]
-    expect(accountBalance({ id: 'cash', openingBalanceMinor: 10000 }, transactions)).toBe(10000 + 500000 - 12550 - 99)
-    expect(accountBalance({ id: 'bank', openingBalanceMinor: 0 }, transactions)).toBe(777)
-    expect(accountBalance({ id: 'empty', openingBalanceMinor: -300 }, transactions)).toBe(-300)
+    expect(accountBalance({ id: 'cash', openingBalanceMinor: 10000 }, transactions, [])).toBe(10000 + 500000 - 12550 - 99)
+    expect(accountBalance({ id: 'bank', openingBalanceMinor: 0 }, transactions, [])).toBe(777)
+    expect(accountBalance({ id: 'empty', openingBalanceMinor: -300 }, transactions, [])).toBe(-300)
   })
 })
 

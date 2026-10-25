@@ -65,7 +65,8 @@ export const NO_CATEGORY = 'none'
 
 export type TransactionFilter = {
   query?: string
-  type?: TransactionType
+  /** 'transfer' يعرض التحويلات فقط (ولا يطابق أي مصروف أو دخل). */
+  type?: TransactionType | 'transfer'
   accountId?: string
   /** معرّف فئة، أو NO_CATEGORY. */
   categoryId?: string
@@ -75,7 +76,7 @@ export type TransactionFilter = {
 }
 
 /** يطبّع النص للبحث: أرقام عربية إلى غربية، وتوحيد الهمزات والتاء المربوطة والياء. */
-function normalizeSearch(text: string): string {
+export function normalizeSearch(text: string): string {
   return text
     .toLowerCase()
     .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
@@ -126,10 +127,10 @@ export function summarize(transactions: Transaction[]): CurrencySummary[] {
   })
 }
 
-/** يجمع العمليات المرتبة حسب اليوم، مع الحفاظ على الترتيب. */
-export function groupByDate(transactions: Transaction[]): { date: string; items: Transaction[] }[] {
-  const groups: { date: string; items: Transaction[] }[] = []
-  for (const t of transactions) {
+/** يجمع العناصر المرتبة حسب اليوم، مع الحفاظ على الترتيب. */
+export function groupByDate<T extends { date: string }>(items: T[]): { date: string; items: T[] }[] {
+  const groups: { date: string; items: T[] }[] = []
+  for (const t of items) {
     const last = groups.at(-1)
     if (last?.date === t.date) last.items.push(t)
     else groups.push({ date: t.date, items: [t] })

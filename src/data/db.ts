@@ -2,7 +2,9 @@ import { Dexie, type EntityTable } from 'dexie'
 import type { Account } from '../domain/accounts'
 import type { Budget } from '../domain/budgets'
 import type { Category } from '../domain/categories'
+import type { Debt, DebtPayment } from '../domain/debts'
 import type { Transaction } from '../domain/transactions'
+import type { Transfer } from '../domain/transfers'
 
 /** إعدادات التطبيق: سجل واحد بالمعرّف 'app'. */
 export type AppSettings = {
@@ -22,6 +24,9 @@ export class QirshDB extends Dexie {
   transactions!: EntityTable<Transaction, 'id'>
   categories!: EntityTable<Category, 'id'>
   budgets!: EntityTable<Budget, 'id'>
+  transfers!: EntityTable<Transfer, 'id'>
+  debts!: EntityTable<Debt, 'id'>
+  debtPayments!: EntityTable<DebtPayment, 'id'>
 
   constructor(name = 'qirsh') {
     super(name)
@@ -51,6 +56,13 @@ export class QirshDB extends Dexie {
     // الإصدار 4 (المرحلة 5): جدول الميزانيات.
     this.version(4).stores({
       budgets: 'id, categoryId, currency',
+    })
+
+    // الإصدار 5 (المرحلة 6): التحويلات والديون ودفعاتها.
+    this.version(5).stores({
+      transfers: 'id, date, fromAccountId, toAccountId',
+      debts: 'id, direction',
+      debtPayments: 'id, debtId',
     })
   }
 }

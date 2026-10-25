@@ -12,6 +12,11 @@ import { TransactionsScreen } from '../features/transactions/TransactionsScreen'
 import { BudgetDetailScreen } from '../features/budgets/BudgetDetailScreen'
 import { BudgetFormScreen } from '../features/budgets/BudgetFormScreen'
 import { BudgetsScreen } from '../features/budgets/BudgetsScreen'
+import { DebtDetailScreen } from '../features/debts/DebtDetailScreen'
+import { DebtFormScreen } from '../features/debts/DebtFormScreen'
+import { DebtsScreen } from '../features/debts/DebtsScreen'
+import { TransferDetailScreen } from '../features/transfers/TransferDetailScreen'
+import { TransferFormScreen } from '../features/transfers/TransferFormScreen'
 import { AppLayout } from './AppLayout'
 import { RequireOnboarding, WelcomeRoute } from './guards'
 
@@ -29,6 +34,13 @@ export const routes: RouteObject[] = [
       { path: 'transactions/new', element: <TransactionFormScreen /> },
       { path: 'transactions/:id', element: <TransactionDetailScreen /> },
       { path: 'transactions/:id/edit', element: <TransactionFormScreen /> },
+      { path: 'transfers/new', element: <TransferFormScreen /> },
+      { path: 'transfers/:id', element: <TransferDetailScreen /> },
+      { path: 'transfers/:id/edit', element: <TransferFormScreen /> },
+      { path: 'debts', element: <DebtsScreen /> },
+      { path: 'debts/new', element: <DebtFormScreen /> },
+      { path: 'debts/:id', element: <DebtDetailScreen /> },
+      { path: 'debts/:id/edit', element: <DebtFormScreen /> },
       { path: 'budgets', element: <BudgetsScreen /> },
       { path: 'budgets/new', element: <BudgetFormScreen /> },
       { path: 'budgets/:id', element: <BudgetDetailScreen /> },

@@ -25,7 +25,7 @@ function input(patch: Partial<TransactionInput> = {}): TransactionInput {
 
 async function balanceOf(accountId: string) {
   const account = (await listAccounts()).find((a) => a.id === accountId)!
-  return accountBalance(account, await listTransactions())
+  return accountBalance(account, await listTransactions(), [])
 }
 
 describe('transactionsRepo', () => {

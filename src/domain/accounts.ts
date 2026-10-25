@@ -1,4 +1,5 @@
 import { signedAmount, type Transaction } from './transactions'
+import { transferEffect, type Transfer } from './transfers'
 import type { Currency } from './money'
 
 /**
@@ -54,14 +55,16 @@ export function validateAccount(input: AccountInput, otherAccounts: Pick<Account
 }
 
 /**
- * الرصيد الحالي للحساب = الرصيد الافتتاحي + الدخل − المصروف.
- * (تُضاف التحويلات في المرحلة 6.) transactions: كل العمليات، ويُؤخذ منها ما يخص الحساب.
+ * الرصيد الحالي للحساب = الرصيد الافتتاحي + الدخل − المصروف + التحويلات الواردة − الصادرة.
+ * transactions وtransfers: الكل، ويُؤخذ منها ما يخص الحساب. الديون لا تؤثر على الرصيد.
  */
 export function accountBalance(
   account: Pick<Account, 'id' | 'openingBalanceMinor'>,
   transactions: Pick<Transaction, 'accountId' | 'type' | 'amountMinor'>[],
+  transfers: Pick<Transfer, 'fromAccountId' | 'toAccountId' | 'fromAmountMinor' | 'toAmountMinor'>[],
 ): number {
-  return transactions
+  const fromTransactions = transactions
     .filter((t) => t.accountId === account.id)
-    .reduce((balance, t) => balance + signedAmount(t), account.openingBalanceMinor)
+    .reduce((sum, t) => sum + signedAmount(t), 0)
+  return account.openingBalanceMinor + fromTransactions + transferEffect(account.id, transfers)
 }

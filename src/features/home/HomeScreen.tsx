@@ -8,10 +8,13 @@ import { Money } from '../../components/Money'
 import { MonthNav } from '../../components/MonthNav'
 import { listAccounts } from '../../data/accountsRepo'
 import { listBudgets } from '../../data/budgetsRepo'
+import { listDebtPayments, listDebts } from '../../data/debtsRepo'
 import { listCategories } from '../../data/categoriesRepo'
 import { listTransactions } from '../../data/transactionsRepo'
+import { listTransfers } from '../../data/transfersRepo'
 import { accountBalance } from '../../domain/accounts'
 import { categoryBreakdown } from '../../domain/categories'
+import { debtStatus } from '../../domain/debts'
 import { CURRENCIES, currencyLabels } from '../../domain/money'
 import { currentMonth, formatMonth, monthRange } from '../../domain/months'
 import { filterTransactions, sortTransactions, summarize } from '../../domain/transactions'
@@ -26,6 +29,9 @@ export function HomeScreen() {
   const accounts = useLiveQuery(listAccounts)
   const categories = useLiveQuery(listCategories)
   const budgets = useLiveQuery(listBudgets)
+  const transfers = useLiveQuery(listTransfers)
+  const debts = useLiveQuery(listDebts)
+  const debtPayments = useLiveQuery(listDebtPayments)
   const [params, setParams] = useSearchParams()
 
   const thisMonth = currentMonth()
@@ -33,11 +39,37 @@ export function HomeScreen() {
   const month = /^\d{4}-\d{2}$/.test(requested) && requested <= thisMonth ? requested : thisMonth
   const { from, to } = monthRange(month)
 
-  if (!transactions || !accounts || !categories || !budgets) return null
+  if (!transactions || !accounts || !categories || !budgets || !transfers || !debts || !debtPayments) return null
 
   const names = Object.fromEntries([...accounts, ...categories].map((x) => [x.id, x.name]))
 
-  if (transactions.length === 0) {
+  // الديون غير المسدَّدة: المتبقي لكل اتجاه وعملة.
+  const openDebts = debts
+    .map((debt) => ({ debt, status: debtStatus(debt, debtPayments) }))
+    .filter((x) => !x.status.settled)
+  const debtTotals = (['owed_to_me', 'owed_by_me'] as const).flatMap((direction) =>
+    CURRENCIES.map((currency) => ({
+      direction,
+      currency,
+      minor: openDebts
+        .filter((x) => x.debt.direction === direction && x.debt.currency === currency)
+        .reduce((sum, x) => sum + x.status.remainingMinor, 0),
+    })).filter((t) => t.minor > 0),
+  )
+
+  const debtSummary = debtTotals.length > 0 && (
+        <Link to="/debts" className="card debts-summary" aria-label="ملخص الديون">
+          <span className="section-title section-title--flush">الديون غير المسدَّدة</span>
+          {debtTotals.map((t) => (
+            <span key={`${t.direction}-${t.currency}`} className="debts-summary__row">
+              <span>{t.direction === 'owed_to_me' ? 'لك عند الآخرين' : 'عليك للآخرين'}</span>
+              <Money minor={t.minor} currency={t.currency} />
+            </span>
+          ))}
+        </Link>
+  )
+
+  if (transactions.length === 0 && transfers.length === 0) {
     return (
       <>
         <h1 className="page-title">الرئيسية</h1>
@@ -52,9 +84,13 @@ export function HomeScreen() {
               <Link to="/transactions/new?type=income" className="btn btn--secondary btn--md">
                 إضافة دخل
               </Link>
+              <Link to="/transfers/new" className="btn btn--secondary btn--md">
+                تحويل
+              </Link>
             </div>
           }
         />
+        {debtSummary}
       </>
     )
   }
@@ -67,7 +103,7 @@ export function HomeScreen() {
     accounts: accounts.filter((a) => a.currency === currency),
   }))
     .filter((b) => b.accounts.length > 0)
-    .map((b) => ({ ...b, minor: b.accounts.reduce((sum, a) => sum + accountBalance(a, transactions), 0) }))
+    .map((b) => ({ ...b, minor: b.accounts.reduce((sum, a) => sum + accountBalance(a, transactions, transfers), 0) }))
 
   const setMonth = (next: string) => setParams(next === thisMonth ? {} : { month: next }, { replace: true })
   const linkForCategory = (categoryId: string) =>
@@ -92,6 +128,10 @@ export function HomeScreen() {
         <Link to="/transactions/new?type=income" className="btn btn--secondary btn--md">
           <Icon name="plus" size={20} />
           دخل
+        </Link>
+        <Link to="/transfers/new" className="btn btn--secondary btn--md">
+          <Icon name="swap" size={20} />
+          تحويل
         </Link>
       </div>
 
@@ -137,6 +177,9 @@ export function HomeScreen() {
         )
       })}
 
+      {debtSummary}
+
+      {recent.length > 0 && (
       <section className="stack stack--tight" aria-labelledby="recent-title">
         <div className="page-header">
           <h2 id="recent-title" className="section-title section-title--flush">
@@ -158,6 +201,7 @@ export function HomeScreen() {
           ))}
         </ul>
       </section>
+      )}
     </div>
   )
 }

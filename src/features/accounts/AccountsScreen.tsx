@@ -5,6 +5,7 @@ import { Icon, type IconName } from '../../components/Icon'
 import { Money } from '../../components/Money'
 import { listAccounts } from '../../data/accountsRepo'
 import { listTransactions } from '../../data/transactionsRepo'
+import { listTransfers } from '../../data/transfersRepo'
 import { accountBalance, accountTypeLabels, type AccountType } from '../../domain/accounts'
 import { CURRENCIES, currencyLabels } from '../../domain/money'
 
@@ -18,12 +19,13 @@ const accountTypeIcons: Record<AccountType, IconName> = {
 export function AccountsScreen() {
   const accounts = useLiveQuery(listAccounts)
   const transactions = useLiveQuery(listTransactions)
-  if (!accounts || !transactions) return null
+  const transfers = useLiveQuery(listTransfers)
+  if (!accounts || !transactions || !transfers) return null
 
   // إجمالي كل عملة على حدة؛ لا تُجمع العملتان في رقم واحد.
   const totals = CURRENCIES.map((currency) => ({
     currency,
-    minor: accounts.filter((a) => a.currency === currency).reduce((sum, a) => sum + accountBalance(a, transactions), 0),
+    minor: accounts.filter((a) => a.currency === currency).reduce((sum, a) => sum + accountBalance(a, transactions, transfers), 0),
     count: accounts.filter((a) => a.currency === currency).length,
   })).filter((t) => t.count > 0)
 
@@ -56,7 +58,7 @@ export function AccountsScreen() {
                   {accountTypeLabels[a.type]} · {currencyLabels[a.currency]}
                 </span>
               </span>
-              <Money minor={accountBalance(a, transactions)} currency={a.currency} className="list-item__amount" />
+              <Money minor={accountBalance(a, transactions, transfers)} currency={a.currency} className="list-item__amount" />
               <Icon name="chevron" size={18} />
             </Link>
           </li>

@@ -7,6 +7,7 @@ const navItems: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'الرئيسية', icon: 'home' },
   { to: '/transactions', label: 'العمليات', icon: 'list' },
   { to: '/budgets', label: 'الميزانيات', icon: 'wallet' },
+  { to: '/debts', label: 'الديون', icon: 'people' },
   { to: '/settings', label: 'الإعدادات', icon: 'settings' },
 ]
 

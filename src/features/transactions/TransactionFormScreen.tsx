@@ -17,7 +17,7 @@ import { alertMessage, budgetLabel } from '../budgets/budgetLabels'
 import type { Account } from '../../domain/accounts'
 import type { Category } from '../../domain/categories'
 import { todayISO } from '../../domain/dates'
-import { currencyLabels, parseAmount, toInputValue } from '../../domain/money'
+import { currencyLabels, parseAmount, toInputValue, currencySymbols } from '../../domain/money'
 import {
   DESCRIPTION_MAX,
   TRANSACTION_TYPES,
@@ -29,8 +29,6 @@ import {
 } from '../../domain/transactions'
 
 const typeOptions = TRANSACTION_TYPES.map((value) => ({ value, label: transactionTypeLabels[value] }))
-const currencySymbol = { ILS: '₪', USD: '$' } as const
-
 /** /transactions/new?type=expense لإضافة عملية، و /transactions/:id/edit لتعديلها. */
 export function TransactionFormScreen() {
   const { id } = useParams()
@@ -94,7 +92,7 @@ function TransactionForm({ accounts, categories, transaction }: FormProps) {
   const [saving, setSaving] = useState(false)
 
   const account = accounts.find((a) => a.id === accountId)
-  const accountOptions = accounts.map((a) => ({ value: a.id, label: `${a.name} ${currencySymbol[a.currency]}` }))
+  const accountOptions = accounts.map((a) => ({ value: a.id, label: `${a.name} ${currencySymbols[a.currency]}` }))
   // فئات النوع المختار غير المؤرشفة، مع فئة العملية الحالية حتى لو أُرشفت.
   const categoryOptions = [
     { value: '', label: 'بلا فئة' },

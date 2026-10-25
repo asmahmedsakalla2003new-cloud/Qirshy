@@ -11,7 +11,7 @@ export const currencyLabels: Record<Currency, string> = {
   USD: 'دولار',
 }
 
-const currencySymbols: Record<Currency, string> = {
+export const currencySymbols: Record<Currency, string> = {
   ILS: '₪',
   USD: '$',
 }
