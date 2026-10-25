@@ -89,7 +89,7 @@ describe('transactionsRepo', () => {
   })
 })
 
-describe('ترحيل قاعدة البيانات من الإصدار 1 إلى 2', () => {
+describe('ترحيل قاعدة البيانات من الإصدار 1 إلى أحدث إصدار', () => {
   it('يحافظ على الحسابات والإعدادات ويضيف جدول العمليات', async () => {
     db.close()
     await Dexie.delete('qirsh-migration')
@@ -105,7 +105,7 @@ describe('ترحيل قاعدة البيانات من الإصدار 1 إلى 2'
     const v2 = new QirshDB('qirsh-migration')
     try {
       await v2.open()
-      expect(v2.verno).toBe(2)
+      expect(v2.verno).toBe(db.verno)
       expect(await v2.accounts.get('jp')).toMatchObject({ name: 'جوال باي', openingBalanceMinor: 15050 })
       expect((await v2.settings.get('app'))?.onboardedAt).toBe('2026-10-24T00:00:00.000Z')
       expect(await v2.transactions.count()).toBe(0)

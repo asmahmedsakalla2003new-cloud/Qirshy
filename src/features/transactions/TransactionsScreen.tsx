@@ -4,19 +4,20 @@ import { Link, useSearchParams } from 'react-router'
 import { useFlash } from '../../app/useFlash'
 import { Alert } from '../../components/Alert'
 import { Button } from '../../components/Button'
-import { Card } from '../../components/Card'
 import { ChoiceGroup } from '../../components/ChoiceGroup'
+import { CurrencySummaryCard } from '../../components/CurrencySummaryCard'
 import { EmptyState } from '../../components/EmptyState'
 import { Icon } from '../../components/Icon'
-import { Money } from '../../components/Money'
 import { SelectField } from '../../components/SelectField'
 import { TextField } from '../../components/TextField'
 import { listAccounts } from '../../data/accountsRepo'
+import { listCategories } from '../../data/categoriesRepo'
 import { listTransactions } from '../../data/transactionsRepo'
 import { formatDayHeading, todayISO } from '../../domain/dates'
 import { currencyLabels } from '../../domain/money'
 import {
   filterTransactions,
+  NO_CATEGORY,
   groupByDate,
   sortTransactions,
   summarize,
@@ -33,7 +34,7 @@ const typeOptions = [
 
 type TypeOption = (typeof typeOptions)[number]['value']
 
-const PARAM_KEYS = { query: 'q', type: 'type', accountId: 'account', from: 'from', to: 'to' } as const
+const PARAM_KEYS = { query: 'q', type: 'type', accountId: 'account', categoryId: 'category', from: 'from', to: 'to' } as const
 
 /**
  * التصفية في حالة محلية تستجيب فوراً للكتابة، وتُنسخ إلى الرابط بعدها
@@ -46,6 +47,7 @@ function useUrlFilter() {
     query: params.get('q') ?? '',
     type: (params.get('type') as TransactionType | null) ?? undefined,
     accountId: params.get('account') ?? undefined,
+    categoryId: params.get('category') ?? undefined,
     from: params.get('from') ?? undefined,
     to: params.get('to') ?? undefined,
   }))
@@ -68,19 +70,23 @@ export function TransactionsScreen() {
   const flash = useFlash()
   const transactions = useLiveQuery(listTransactions)
   const accounts = useLiveQuery(listAccounts)
+  const categories = useLiveQuery(listCategories)
   const [filter, setFilter, clearFilter] = useUrlFilter()
   const filtersActive = Object.values(filter).some(Boolean)
   // لوحة التصفية تُفتح تلقائياً إذا وُجدت تصفية عند فتح الشاشة، ثم يتحكم بها المستخدم وحده.
-  const [filtersOpen, setFiltersOpen] = useState(() => !!(filter.type || filter.accountId || filter.from || filter.to))
+  const [filtersOpen, setFiltersOpen] = useState(() => !!(filter.type || filter.accountId || filter.categoryId || filter.from || filter.to))
 
-  const accountNames = useMemo(
-    () => Object.fromEntries((accounts ?? []).map((a) => [a.id, a.name])),
-    [accounts],
+  // أسماء الحسابات والفئات حسب المعرّف، للعرض وللبحث.
+  const names = useMemo(
+    () => Object.fromEntries([...(accounts ?? []), ...(categories ?? [])].map((x) => [x.id, x.name])),
+    [accounts, categories],
   )
 
-  if (!transactions || !accounts) return null
+  if (!transactions || !accounts || !categories) return null
 
-  const visible = sortTransactions(filterTransactions(transactions, filter, accountNames))
+  const visible = sortTransactions(filterTransactions(transactions, filter, names))
+  // فئات النوع المصفّى (أو الكل)، مع المؤرشفة لأنها قد تكون في عمليات قديمة.
+  const categoryOptions = categories.filter((c) => !filter.type || c.kind === filter.type)
   const summary = summarize(visible)
 
   return (
@@ -123,7 +129,11 @@ export function TransactionsScreen() {
                   legend="النوع"
                   options={typeOptions}
                   value={(filter.type ?? '') as TypeOption}
-                  onChange={(v) => setFilter({ type: v || undefined })}
+                  onChange={(v) => {
+                    // فئة النوع الآخر لا تطابق شيئاً؛ تُلغى عند تغيير النوع.
+                    const keep = !v || categories.find((c) => c.id === filter.categoryId)?.kind === v
+                    setFilter({ type: v || undefined, ...(keep ? {} : { categoryId: undefined }) })
+                  }}
                 />
                 <SelectField
                   label="الحساب"
@@ -132,6 +142,19 @@ export function TransactionsScreen() {
                   options={[
                     { value: '', label: 'كل الحسابات' },
                     ...accounts.map((a) => ({ value: a.id, label: `${a.name} (${currencyLabels[a.currency]})` })),
+                  ]}
+                />
+                <SelectField
+                  label="الفئة"
+                  value={filter.categoryId ?? ''}
+                  onChange={(e) => setFilter({ categoryId: e.target.value || undefined })}
+                  options={[
+                    { value: '', label: 'كل الفئات' },
+                    ...categoryOptions.map((c) => ({
+                      value: c.id,
+                      label: `${c.name}${filter.type ? '' : c.kind === 'income' ? ' (دخل)' : ' (مصروف)'}`,
+                    })),
+                    { value: NO_CATEGORY, label: 'بلا فئة' },
                   ]}
                 />
                 <div className="row-2">
@@ -163,29 +186,7 @@ export function TransactionsScreen() {
           {summary.length > 0 && (
             <section className="totals" aria-label="ملخص العمليات المعروضة">
               {summary.map((s) => (
-                <Card key={s.currency} className="summary">
-                  <p className="total__label">بال{currencyLabels[s.currency]}</p>
-                  <dl className="summary__rows">
-                    <div>
-                      <dt>الدخل</dt>
-                      <dd>
-                        <Money minor={s.incomeMinor} currency={s.currency} />
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>المصروف</dt>
-                      <dd>
-                        <Money minor={s.expenseMinor} currency={s.currency} />
-                      </dd>
-                    </div>
-                    <div className="summary__net">
-                      <dt>الصافي</dt>
-                      <dd>
-                        <Money minor={s.netMinor} currency={s.currency} signed />
-                      </dd>
-                    </div>
-                  </dl>
-                </Card>
+                <CurrencySummaryCard key={s.currency} summary={s} />
               ))}
             </section>
           )}
@@ -207,7 +208,11 @@ export function TransactionsScreen() {
                 <ul className="list">
                   {group.items.map((t) => (
                     <li key={t.id}>
-                      <TransactionRow transaction={t} accountName={accountNames[t.accountId] ?? '—'} />
+                      <TransactionRow
+                        transaction={t}
+                        accountName={names[t.accountId] ?? '—'}
+                        categoryName={t.categoryId ? names[t.categoryId] : undefined}
+                      />
                     </li>
                   ))}
                 </ul>

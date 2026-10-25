@@ -21,11 +21,18 @@ async function prepare(input: TransactionInput): Promise<Pick<Transaction, 'curr
   const account = await db.accounts.get(input.accountId)
   if (!account) throw new ValidationError({ accountId: 'الحساب المختار غير موجود.' })
 
+  if (input.categoryId) {
+    const category = await db.categories.get(input.categoryId)
+    if (!category || category.kind !== input.type) {
+      throw new ValidationError({ categoryId: 'الفئة المختارة لا تناسب نوع العملية.' })
+    }
+  }
+
   return { ...input, description: input.description.trim(), currency: account.currency }
 }
 
 export async function createTransaction(input: TransactionInput): Promise<Transaction> {
-  return db.transaction('rw', db.transactions, db.accounts, async () => {
+  return db.transaction('rw', db.transactions, db.accounts, db.categories, async () => {
     const now = new Date().toISOString()
     const transaction: Transaction = { ...(await prepare(input)), id: crypto.randomUUID(), createdAt: now, updatedAt: now }
     await db.transactions.add(transaction)
@@ -34,7 +41,7 @@ export async function createTransaction(input: TransactionInput): Promise<Transa
 }
 
 export async function updateTransaction(id: string, input: TransactionInput): Promise<void> {
-  await db.transaction('rw', db.transactions, db.accounts, async () => {
+  await db.transaction('rw', db.transactions, db.accounts, db.categories, async () => {
     const changed = await db.transactions.update(id, { ...(await prepare(input)), updatedAt: new Date().toISOString() })
     if (!changed) throw new Error('العملية غير موجودة.')
   })

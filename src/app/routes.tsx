@@ -2,7 +2,10 @@ import { Navigate, type RouteObject } from 'react-router'
 import { DesignSystemScreen } from '../features/design-system/DesignSystemScreen'
 import { AccountFormScreen } from '../features/accounts/AccountFormScreen'
 import { AccountsScreen } from '../features/accounts/AccountsScreen'
-import { BudgetsScreen, HomeScreen } from '../features/placeholders'
+import { CategoriesScreen } from '../features/categories/CategoriesScreen'
+import { CategoryFormScreen } from '../features/categories/CategoryFormScreen'
+import { HomeScreen } from '../features/home/HomeScreen'
+import { BudgetsScreen } from '../features/placeholders'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
 import { TransactionDetailScreen } from '../features/transactions/TransactionDetailScreen'
 import { TransactionFormScreen } from '../features/transactions/TransactionFormScreen'
@@ -29,6 +32,9 @@ export const routes: RouteObject[] = [
       { path: 'settings/accounts', element: <AccountsScreen /> },
       { path: 'settings/accounts/new', element: <AccountFormScreen /> },
       { path: 'settings/accounts/:id', element: <AccountFormScreen /> },
+      { path: 'settings/categories', element: <CategoriesScreen /> },
+      { path: 'settings/categories/new', element: <CategoryFormScreen /> },
+      { path: 'settings/categories/:id', element: <CategoryFormScreen /> },
       { path: 'design', element: <DesignSystemScreen /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],

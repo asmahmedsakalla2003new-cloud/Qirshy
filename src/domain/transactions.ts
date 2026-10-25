@@ -23,7 +23,7 @@ export type Transaction = {
   accountId: string
   /** YYYY-MM-DD بالتوقيت المحلي. */
   date: string
-  /** الفئة (تُفعَّل في المرحلة 4). */
+  /** فئة من نوع العملية نفسه، أو null. */
   categoryId: string | null
   description: string
   createdAt: string
@@ -37,7 +37,7 @@ export type TransactionInput = Pick<
 
 export const DESCRIPTION_MAX = 200
 
-export type TransactionErrors = Partial<Record<'type' | 'amount' | 'accountId' | 'date' | 'description', string>>
+export type TransactionErrors = Partial<Record<'type' | 'amount' | 'accountId' | 'categoryId' | 'date' | 'description', string>>
 
 /** يتحقق من العملية. المبلغ يُقرأ ويُتحقق منه في parseAmount قبل الوصول إلى هنا. */
 export function validateTransaction(input: TransactionInput, today = todayISO()): TransactionErrors {
@@ -60,10 +60,15 @@ export function signedAmount(t: Pick<Transaction, 'type' | 'amountMinor'>): numb
   return t.type === 'income' ? t.amountMinor : -t.amountMinor
 }
 
+/** قيمة تصفية للعمليات التي بلا فئة. */
+export const NO_CATEGORY = 'none'
+
 export type TransactionFilter = {
   query?: string
   type?: TransactionType
   accountId?: string
+  /** معرّف فئة، أو NO_CATEGORY. */
+  categoryId?: string
   /** YYYY-MM-DD شاملاً. */
   from?: string
   to?: string
@@ -84,17 +89,20 @@ function normalizeSearch(text: string): string {
 export function filterTransactions(
   transactions: Transaction[],
   filter: TransactionFilter,
-  accountNames: Record<string, string> = {},
+  /** أسماء الحسابات والفئات حسب المعرّف، ليشملها البحث. */
+  names: Record<string, string> = {},
 ): Transaction[] {
   const query = normalizeSearch(filter.query ?? '')
   return transactions.filter((t) => {
     if (filter.type && t.type !== filter.type) return false
     if (filter.accountId && t.accountId !== filter.accountId) return false
+    if (filter.categoryId && (t.categoryId ?? NO_CATEGORY) !== filter.categoryId) return false
     if (filter.from && t.date < filter.from) return false
     if (filter.to && t.date > filter.to) return false
     if (query) {
       const amount = (t.amountMinor / 100).toFixed(2)
-      const haystack = normalizeSearch(`${t.description} ${accountNames[t.accountId] ?? ''} ${amount}`)
+      const category = t.categoryId ? (names[t.categoryId] ?? '') : ''
+      const haystack = normalizeSearch(`${t.description} ${names[t.accountId] ?? ''} ${category} ${amount}`)
       if (!haystack.includes(query)) return false
     }
     return true

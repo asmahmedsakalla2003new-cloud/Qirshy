@@ -9,6 +9,7 @@ import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { EmptyState } from '../../components/EmptyState'
 import { Money } from '../../components/Money'
 import { getAccount } from '../../data/accountsRepo'
+import { getCategory } from '../../data/categoriesRepo'
 import { deleteTransaction, getTransaction } from '../../data/transactionsRepo'
 import { formatDateLong, formatDateTime } from '../../domain/dates'
 import { signedAmount, transactionTypeLabels } from '../../domain/transactions'
@@ -23,7 +24,11 @@ export function TransactionDetailScreen() {
   const data = useLiveQuery(async () => {
     const transaction = await getTransaction(id)
     if (!transaction) return null
-    return { transaction, account: await getAccount(transaction.accountId) }
+    return {
+      transaction,
+      account: await getAccount(transaction.accountId),
+      category: transaction.categoryId ? await getCategory(transaction.categoryId) : undefined,
+    }
   }, [id])
 
   if (data === undefined) return null
@@ -37,7 +42,7 @@ export function TransactionDetailScreen() {
     )
   }
 
-  const { transaction: t, account } = data
+  const { transaction: t, account, category } = data
   const typeLabel = transactionTypeLabels[t.type]
 
   async function remove() {
@@ -72,6 +77,10 @@ export function TransactionDetailScreen() {
           <div>
             <dt>{t.type === 'income' ? 'إلى حساب' : 'من حساب'}</dt>
             <dd>{account?.name ?? '—'}</dd>
+          </div>
+          <div>
+            <dt>الفئة</dt>
+            <dd>{category?.name ?? <span className="muted">بلا فئة</span>}</dd>
           </div>
           <div>
             <dt>التاريخ</dt>

@@ -7,15 +7,8 @@ import { Icon } from '../../components/Icon'
 import { listAccounts } from '../../data/accountsRepo'
 import { getSettings } from '../../data/settingsRepo'
 import { getStorageStatus, type StorageStatus } from '../../data/storage'
+import { accountForms, countLabel } from '../../domain/arabic'
 import { formatDateTime } from '../../domain/dates'
-
-/** صيغة العدد العربية: حساب واحد، حسابان، 3 حسابات، 11 حساباً. */
-function countAccounts(n: number): string {
-  if (n === 1) return 'حساب واحد'
-  if (n === 2) return 'حسابان'
-  if (n >= 3 && n <= 10) return `${n} حسابات`
-  return `${n} حساباً`
-}
 
 function persistedLabel(status: StorageStatus | undefined): string {
   if (!status) return '…'
@@ -45,8 +38,22 @@ export function SettingsScreen() {
           <span className="list-item__main">
             <span className="list-item__title">إدارة الحسابات</span>
             <span className="list-item__meta">
-              {accountCount === undefined ? '…' : countAccounts(accountCount)} — نقد، بنك، جوال باي، بال باي
+              {accountCount === undefined ? '…' : countLabel(accountCount, accountForms)} — نقد، بنك، جوال باي، بال باي
             </span>
+          </span>
+          <Icon name="chevron" size={18} />
+        </Link>
+      </Card>
+
+      <Card>
+        <h2 className="section-title">الفئات</h2>
+        <Link to="/settings/categories" className="list-item list-item--plain">
+          <span className="list-item__icon">
+            <Icon name="list" />
+          </span>
+          <span className="list-item__main">
+            <span className="list-item__title">إدارة الفئات</span>
+            <span className="list-item__meta">فئات المصروف والدخل، وإضافة فئاتك الخاصة</span>
           </span>
           <Icon name="chevron" size={18} />
         </Link>

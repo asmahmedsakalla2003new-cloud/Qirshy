@@ -7,9 +7,11 @@ import { ChoiceGroup } from '../../components/ChoiceGroup'
 import { EmptyState } from '../../components/EmptyState'
 import { TextField } from '../../components/TextField'
 import { listAccounts } from '../../data/accountsRepo'
+import { listCategories } from '../../data/categoriesRepo'
 import { ValidationError } from '../../data/errors'
 import { createTransaction, getTransaction, updateTransaction } from '../../data/transactionsRepo'
 import type { Account } from '../../domain/accounts'
+import type { Category } from '../../domain/categories'
 import { todayISO } from '../../domain/dates'
 import { currencyLabels, parseAmount, toInputValue } from '../../domain/money'
 import {
@@ -29,10 +31,11 @@ const currencySymbol = { ILS: '₪', USD: '$' } as const
 export function TransactionFormScreen() {
   const { id } = useParams()
   const accounts = useLiveQuery(listAccounts)
+  const categories = useLiveQuery(listCategories)
   // null: العملية غير موجودة. undefined: جارٍ التحميل.
   const transaction = useLiveQuery(async () => (id ? ((await getTransaction(id)) ?? null) : null), [id])
 
-  if (!accounts || (id && transaction === undefined)) return null
+  if (!accounts || !categories || (id && transaction === undefined)) return null
   if (id && transaction === null) {
     return (
       <EmptyState
@@ -42,10 +45,19 @@ export function TransactionFormScreen() {
       />
     )
   }
-  return <TransactionForm key={transaction?.id ?? 'new'} accounts={accounts} transaction={transaction ?? undefined} />
+  return (
+    <TransactionForm
+      key={transaction?.id ?? 'new'}
+      accounts={accounts}
+      categories={categories}
+      transaction={transaction ?? undefined}
+    />
+  )
 }
 
-function TransactionForm({ accounts, transaction }: { accounts: Account[]; transaction?: Transaction }) {
+type FormProps = { accounts: Account[]; categories: Category[]; transaction?: Transaction }
+
+function TransactionForm({ accounts, categories, transaction }: FormProps) {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const isEdit = !!transaction
@@ -54,6 +66,7 @@ function TransactionForm({ accounts, transaction }: { accounts: Account[]; trans
   const [type, setType] = useState<TransactionType>(initialType)
   const [amount, setAmount] = useState(transaction ? toInputValue(transaction.amountMinor) : '')
   const [accountId, setAccountId] = useState(transaction?.accountId ?? accounts[0]?.id ?? '')
+  const [categoryId, setCategoryId] = useState(transaction?.categoryId ?? '')
   const [date, setDate] = useState(transaction?.date ?? todayISO())
   const [description, setDescription] = useState(transaction?.description ?? '')
   const [errors, setErrors] = useState<TransactionErrors>({})
@@ -62,6 +75,19 @@ function TransactionForm({ accounts, transaction }: { accounts: Account[]; trans
 
   const account = accounts.find((a) => a.id === accountId)
   const accountOptions = accounts.map((a) => ({ value: a.id, label: `${a.name} ${currencySymbol[a.currency]}` }))
+  // فئات النوع المختار غير المؤرشفة، مع فئة العملية الحالية حتى لو أُرشفت.
+  const categoryOptions = [
+    { value: '', label: 'بلا فئة' },
+    ...categories
+      .filter((c) => c.kind === type && (!c.archived || c.id === transaction?.categoryId))
+      .map((c) => ({ value: c.id, label: c.name })),
+  ]
+
+  function changeType(next: TransactionType) {
+    // الفئة تخص نوعاً واحداً؛ عند تغيير النوع تُلغى فئة النوع الآخر.
+    if (categories.find((c) => c.id === categoryId)?.kind !== next) setCategoryId('')
+    setType(next)
+  }
 
   function clearError(field: keyof TransactionErrors) {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }))
@@ -73,7 +99,7 @@ function TransactionForm({ accounts, transaction }: { accounts: Account[]; trans
     setFormError(undefined)
 
     const parsed = parseAmount(amount)
-    const input = { type, amountMinor: parsed.ok ? parsed.minor : 0, accountId, date, categoryId: transaction?.categoryId ?? null, description }
+    const input = { type, amountMinor: parsed.ok ? parsed.minor : 0, accountId, date, categoryId: categoryId || null, description }
     const next = validateTransaction(input)
     if (!parsed.ok) next.amount = parsed.error
     setErrors(next)
@@ -106,7 +132,7 @@ function TransactionForm({ accounts, transaction }: { accounts: Account[]; trans
 
       {formError && <Alert tone="danger">{formError}</Alert>}
 
-      <ChoiceGroup legend="نوع العملية" options={typeOptions} value={type} onChange={setType} />
+      <ChoiceGroup legend="نوع العملية" options={typeOptions} value={type} onChange={changeType} />
 
       <TextField
         label="المبلغ"
@@ -140,6 +166,9 @@ function TransactionForm({ accounts, transaction }: { accounts: Account[]; trans
         }}
       />
       {errors.accountId && <p className="field__error">{errors.accountId}</p>}
+
+      <ChoiceGroup legend="الفئة" options={categoryOptions} value={categoryId} onChange={setCategoryId} />
+      {errors.categoryId && <p className="field__error">{errors.categoryId}</p>}
 
       <TextField
         label="التاريخ"
