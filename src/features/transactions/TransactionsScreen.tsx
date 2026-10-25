@@ -1,7 +1,8 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router'
 import { useFlash } from '../../app/useFlash'
+import { useUrlState } from '../../app/useUrlState'
 import { Alert } from '../../components/Alert'
 import { Button } from '../../components/Button'
 import { ChoiceGroup } from '../../components/ChoiceGroup'
@@ -44,33 +45,24 @@ type Entry =
 
 const PARAM_KEYS = { query: 'q', type: 'type', accountId: 'account', categoryId: 'category', from: 'from', to: 'to' } as const
 
-/**
- * التصفية في حالة محلية تستجيب فوراً للكتابة، وتُنسخ إلى الرابط بعدها
- * لتبقى عند الرجوع من تفاصيل العملية. (ربط الحقول بالرابط مباشرةً يُسقط أحرفاً
- * عند الكتابة السريعة لأن تحديث الرابط غير متزامن.)
- */
+/** التصفية محفوظة في الرابط لتبقى عند الرجوع من تفاصيل العملية. */
 function useUrlFilter() {
-  const [params, setParams] = useSearchParams()
-  const [filter, setFilterState] = useState<TransactionFilter>(() => ({
-    query: params.get('q') ?? '',
-    type: (params.get('type') as TransactionFilter['type'] | null) ?? undefined,
-    accountId: params.get('account') ?? undefined,
-    categoryId: params.get('category') ?? undefined,
-    from: params.get('from') ?? undefined,
-    to: params.get('to') ?? undefined,
-  }))
-
-  useEffect(() => {
-    const next = new URLSearchParams()
-    for (const [key, param] of Object.entries(PARAM_KEYS)) {
-      const value = filter[key as keyof TransactionFilter]
-      if (value) next.set(param, value)
-    }
-    setParams(next, { replace: true })
-  }, [filter, setParams])
-
-  const setFilter = (patch: Partial<TransactionFilter>) => setFilterState((prev) => ({ ...prev, ...patch }))
-  const clearFilter = () => setFilterState({ query: '' })
+  const [params, setParams] = useUrlState(Object.values(PARAM_KEYS))
+  const filter: TransactionFilter = {
+    query: params.q,
+    type: (params.type || undefined) as TransactionFilter['type'],
+    accountId: params.account || undefined,
+    categoryId: params.category || undefined,
+    from: params.from || undefined,
+    to: params.to || undefined,
+  }
+  const setFilter = (patch: Partial<TransactionFilter>) =>
+    setParams(
+      Object.fromEntries(
+        Object.entries(patch).map(([key, value]) => [PARAM_KEYS[key as keyof TransactionFilter], value]),
+      ),
+    )
+  const clearFilter = () => setParams(Object.fromEntries(Object.values(PARAM_KEYS).map((k) => [k, undefined])))
   return [filter, setFilter, clearFilter] as const
 }
 

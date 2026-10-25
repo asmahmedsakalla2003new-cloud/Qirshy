@@ -5,6 +5,7 @@ import { CurrencySummaryCard } from '../../components/CurrencySummaryCard'
 import { EmptyState } from '../../components/EmptyState'
 import { Icon } from '../../components/Icon'
 import { Money } from '../../components/Money'
+import { ShareBars } from '../../components/ShareBars'
 import { MonthNav } from '../../components/MonthNav'
 import { listAccounts } from '../../data/accountsRepo'
 import { listBudgets } from '../../data/budgetsRepo'
@@ -20,7 +21,6 @@ import { currentMonth, formatMonth, monthRange } from '../../domain/months'
 import { filterTransactions, sortTransactions, summarize } from '../../domain/transactions'
 import { BudgetAlerts } from '../budgets/BudgetAlerts'
 import { TransactionRow } from '../transactions/TransactionRow'
-import { CategoryBars } from './CategoryBars'
 
 const RECENT_COUNT = 5
 
@@ -151,6 +151,9 @@ export function HomeScreen() {
 
       <section className="stack stack--tight" aria-labelledby="month-title">
         <MonthNav month={month} onChange={setMonth} max={thisMonth} titleId="month-title" />
+        <Link to="/reports" className="small reports-link">
+          التقارير المفصّلة
+        </Link>
 
         {summary.length === 0 ? (
           <Card>
@@ -172,7 +175,7 @@ export function HomeScreen() {
         return (
           <Card key={s.currency}>
             <h2 className="section-title">{title}</h2>
-            <CategoryBars shares={shares} currency={s.currency} linkFor={linkForCategory} label={title} />
+            <ShareBars shares={shares} currency={s.currency} linkFor={linkForCategory} label={title} />
           </Card>
         )
       })}

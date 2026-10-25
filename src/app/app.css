@@ -765,3 +765,54 @@ a {
 .form-actions--even {
   grid-template-columns: 1fr 1fr;
 }
+
+/* ===== التقارير ===== */
+.reports-link {
+  align-self: center;
+}
+
+.month-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.month-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.month-row__name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.month-row__values {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.month-row__values dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.month-row__values dd {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.export-box {
+  padding-block-start: var(--space-4);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.month-rows__note {
+  margin-block-end: var(--space-3);
+}

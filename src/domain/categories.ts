@@ -47,9 +47,10 @@ export function validateCategory(input: CategoryInput, others: Pick<Category, 'n
   return {}
 }
 
-export type CategoryShare = {
-  /** null: عمليات بلا فئة. */
-  categoryId: string | null
+/** حصة عنصر (فئة أو حساب) من مجموع؛ تُعرض بأعمدة مرتبة. */
+export type Share = {
+  /** معرّف الفئة أو الحساب؛ null للعمليات التي بلا فئة. */
+  id: string | null
   name: string
   amountMinor: number
   /** النسبة من مجموع النوع بهذه العملة، من 0 إلى 1. */
@@ -65,7 +66,7 @@ export function categoryBreakdown(
   categories: Pick<Category, 'id' | 'name'>[],
   currency: Currency,
   kind: TransactionType = 'expense',
-): CategoryShare[] {
+): Share[] {
   const relevant = transactions.filter((t) => t.type === kind && t.currency === currency)
   const total = relevant.reduce((sum, t) => sum + t.amountMinor, 0)
   if (total === 0) return []
@@ -75,10 +76,10 @@ export function categoryBreakdown(
 
   const names = new Map(categories.map((c) => [c.id, c.name]))
   return [...byCategory]
-    .map(([categoryId, amountMinor]) => ({
-      categoryId,
+    .map(([id, amountMinor]) => ({
+      id,
       // فئة محذوفة نهائياً (غير متوقع) تُعرض كـ«بلا فئة» بدل أن تختفي.
-      name: (categoryId && names.get(categoryId)) || 'بلا فئة',
+      name: (id && names.get(id)) || 'بلا فئة',
       amountMinor,
       share: amountMinor / total,
     }))

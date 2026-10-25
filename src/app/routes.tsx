@@ -17,6 +17,7 @@ import { DebtFormScreen } from '../features/debts/DebtFormScreen'
 import { DebtsScreen } from '../features/debts/DebtsScreen'
 import { TransferDetailScreen } from '../features/transfers/TransferDetailScreen'
 import { TransferFormScreen } from '../features/transfers/TransferFormScreen'
+import { ReportsScreen } from '../features/reports/ReportsScreen'
 import { AppLayout } from './AppLayout'
 import { RequireOnboarding, WelcomeRoute } from './guards'
 
@@ -41,6 +42,7 @@ export const routes: RouteObject[] = [
       { path: 'debts/new', element: <DebtFormScreen /> },
       { path: 'debts/:id', element: <DebtDetailScreen /> },
       { path: 'debts/:id/edit', element: <DebtFormScreen /> },
+      { path: 'reports', element: <ReportsScreen /> },
       { path: 'budgets', element: <BudgetsScreen /> },
       { path: 'budgets/new', element: <BudgetFormScreen /> },
       { path: 'budgets/:id', element: <BudgetDetailScreen /> },

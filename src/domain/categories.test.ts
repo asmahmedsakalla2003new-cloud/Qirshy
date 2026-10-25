@@ -53,7 +53,7 @@ describe('categoryBreakdown', () => {
 
   it('يجمع المصاريف حسب الفئة لعملة واحدة، من الأكبر، مع «بلا فئة»', () => {
     const result = categoryBreakdown(list, categories, 'ILS')
-    expect(result.map((r) => [r.categoryId, r.name, r.amountMinor])).toEqual([
+    expect(result.map((r) => [r.id, r.name, r.amountMinor])).toEqual([
       ['food', 'بقالة وطعام', 40000],
       ['transport', 'مواصلات', 10000],
       [null, 'بلا فئة', 50],
@@ -64,7 +64,7 @@ describe('categoryBreakdown', () => {
 
   it('لا يخلط العملات ولا يحسب الدخل مع المصروف', () => {
     expect(categoryBreakdown(list, categories, 'USD')).toEqual([
-      { categoryId: 'food', name: 'بقالة وطعام', amountMinor: 99999, share: 1 },
+      { id: 'food', name: 'بقالة وطعام', amountMinor: 99999, share: 1 },
     ])
     expect(categoryBreakdown(list, categories, 'ILS', 'income').map((r) => r.name)).toEqual(['راتب'])
   })
