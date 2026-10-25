@@ -5,11 +5,13 @@ import { AccountsScreen } from '../features/accounts/AccountsScreen'
 import { CategoriesScreen } from '../features/categories/CategoriesScreen'
 import { CategoryFormScreen } from '../features/categories/CategoryFormScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
-import { BudgetsScreen } from '../features/placeholders'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
 import { TransactionDetailScreen } from '../features/transactions/TransactionDetailScreen'
 import { TransactionFormScreen } from '../features/transactions/TransactionFormScreen'
 import { TransactionsScreen } from '../features/transactions/TransactionsScreen'
+import { BudgetDetailScreen } from '../features/budgets/BudgetDetailScreen'
+import { BudgetFormScreen } from '../features/budgets/BudgetFormScreen'
+import { BudgetsScreen } from '../features/budgets/BudgetsScreen'
 import { AppLayout } from './AppLayout'
 import { RequireOnboarding, WelcomeRoute } from './guards'
 
@@ -28,6 +30,8 @@ export const routes: RouteObject[] = [
       { path: 'transactions/:id', element: <TransactionDetailScreen /> },
       { path: 'transactions/:id/edit', element: <TransactionFormScreen /> },
       { path: 'budgets', element: <BudgetsScreen /> },
+      { path: 'budgets/new', element: <BudgetFormScreen /> },
+      { path: 'budgets/:id', element: <BudgetDetailScreen /> },
       { path: 'settings', element: <SettingsScreen /> },
       { path: 'settings/accounts', element: <AccountsScreen /> },
       { path: 'settings/accounts/new', element: <AccountFormScreen /> },

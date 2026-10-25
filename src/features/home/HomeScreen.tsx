@@ -5,14 +5,17 @@ import { CurrencySummaryCard } from '../../components/CurrencySummaryCard'
 import { EmptyState } from '../../components/EmptyState'
 import { Icon } from '../../components/Icon'
 import { Money } from '../../components/Money'
+import { MonthNav } from '../../components/MonthNav'
 import { listAccounts } from '../../data/accountsRepo'
+import { listBudgets } from '../../data/budgetsRepo'
 import { listCategories } from '../../data/categoriesRepo'
 import { listTransactions } from '../../data/transactionsRepo'
 import { accountBalance } from '../../domain/accounts'
 import { categoryBreakdown } from '../../domain/categories'
 import { CURRENCIES, currencyLabels } from '../../domain/money'
-import { currentMonth, formatMonth, monthRange, shiftMonth } from '../../domain/months'
+import { currentMonth, formatMonth, monthRange } from '../../domain/months'
 import { filterTransactions, sortTransactions, summarize } from '../../domain/transactions'
+import { BudgetAlerts } from '../budgets/BudgetAlerts'
 import { TransactionRow } from '../transactions/TransactionRow'
 import { CategoryBars } from './CategoryBars'
 
@@ -22,6 +25,7 @@ export function HomeScreen() {
   const transactions = useLiveQuery(listTransactions)
   const accounts = useLiveQuery(listAccounts)
   const categories = useLiveQuery(listCategories)
+  const budgets = useLiveQuery(listBudgets)
   const [params, setParams] = useSearchParams()
 
   const thisMonth = currentMonth()
@@ -29,7 +33,7 @@ export function HomeScreen() {
   const month = /^\d{4}-\d{2}$/.test(requested) && requested <= thisMonth ? requested : thisMonth
   const { from, to } = monthRange(month)
 
-  if (!transactions || !accounts || !categories) return null
+  if (!transactions || !accounts || !categories || !budgets) return null
 
   const names = Object.fromEntries([...accounts, ...categories].map((x) => [x.id, x.name]))
 
@@ -73,6 +77,13 @@ export function HomeScreen() {
     <div className="stack">
       <h1 className="page-title page-title--flush">الرئيسية</h1>
 
+      <BudgetAlerts
+        budgets={budgets}
+        transactions={transactions}
+        categoryNames={new Map(categories.map((c) => [c.id, c.name]))}
+        month={thisMonth}
+      />
+
       <div className="quick-actions">
         <Link to="/transactions/new?type=expense" className="btn btn--primary btn--md">
           <Icon name="plus" size={20} />
@@ -99,23 +110,7 @@ export function HomeScreen() {
       </section>
 
       <section className="stack stack--tight" aria-labelledby="month-title">
-        <div className="month-nav">
-          <button type="button" className="icon-btn" aria-label="الشهر السابق" onClick={() => setMonth(shiftMonth(month, -1))}>
-            <Icon name="chevronRight" size={20} />
-          </button>
-          <h2 id="month-title" className="month-nav__title">
-            {formatMonth(month)}
-          </h2>
-          <button
-            type="button"
-            className="icon-btn"
-            aria-label="الشهر التالي"
-            disabled={month >= thisMonth}
-            onClick={() => setMonth(shiftMonth(month, 1))}
-          >
-            <Icon name="chevron" size={20} />
-          </button>
-        </div>
+        <MonthNav month={month} onChange={setMonth} max={thisMonth} titleId="month-title" />
 
         {summary.length === 0 ? (
           <Card>

@@ -94,7 +94,7 @@ describe('categoriesRepo', () => {
   })
 })
 
-describe('الترقية من المرحلة 3 (الإصدار 2) إلى الإصدار 3', () => {
+describe('الترقية من المرحلة 3 (الإصدار 2) إلى أحدث إصدار', () => {
   it('تحافظ على العمليات وتضيف الفئات الافتراضية لمستخدم موجود', async () => {
     db.close()
     await Dexie.delete('qirsh-v2')
@@ -108,7 +108,7 @@ describe('الترقية من المرحلة 3 (الإصدار 2) إلى الإ�
     const v3 = new QirshDB('qirsh-v2')
     try {
       await v3.open()
-      expect(v3.verno).toBe(3)
+      expect(v3.verno).toBe(db.verno)
       expect(await v3.transactions.get('t1')).toMatchObject({ amountMinor: 500 })
       expect(await v3.categories.count()).toBe(0) // الترقية لا تُنشئ بيانات؛ initDatabase تفعل.
     } finally {

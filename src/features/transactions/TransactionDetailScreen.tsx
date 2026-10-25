@@ -18,6 +18,7 @@ export function TransactionDetailScreen() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
   const flash = useFlash()
+  const warning = useFlash('warning')
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState<string>()
 
@@ -62,6 +63,11 @@ export function TransactionDetailScreen() {
       </p>
 
       {flash && <Alert tone="success">{flash}</Alert>}
+      {warning && (
+        <Alert tone="warning" title="تنبيه الميزانية">
+          {warning} <Link to="/budgets">عرض الميزانيات</Link>
+        </Alert>
+      )}
       {error && <Alert tone="danger">{error}</Alert>}
 
       <Card className="tx-hero">

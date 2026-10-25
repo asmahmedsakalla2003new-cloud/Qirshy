@@ -65,9 +65,12 @@ export async function setCategoryArchived(id: string, archived: boolean): Promis
 
 /** الحذف النهائي مسموح فقط لفئة لم تُستخدم في أي عملية. */
 export async function deleteCategory(id: string): Promise<void> {
-  await db.transaction('rw', db.categories, db.transactions, async () => {
+  await db.transaction('rw', db.categories, db.transactions, db.budgets, async () => {
     if ((await countCategoryUsage(id)) > 0) {
       throw new ValidationError({ category: 'هذه الفئة مستخدمة في عمليات. يمكنك أرشفتها بدل حذفها.' })
+    }
+    if ((await db.budgets.where('categoryId').equals(id).count()) > 0) {
+      throw new ValidationError({ category: 'لهذه الفئة ميزانية. احذف الميزانية أولاً أو أرشف الفئة.' })
     }
     await db.categories.delete(id)
   })

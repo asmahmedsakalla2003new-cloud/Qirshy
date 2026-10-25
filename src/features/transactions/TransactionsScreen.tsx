@@ -68,6 +68,7 @@ function useUrlFilter() {
 
 export function TransactionsScreen() {
   const flash = useFlash()
+  const warning = useFlash('warning')
   const transactions = useLiveQuery(listTransactions)
   const accounts = useLiveQuery(listAccounts)
   const categories = useLiveQuery(listCategories)
@@ -100,6 +101,11 @@ export function TransactionsScreen() {
       </div>
 
       {flash && <Alert tone="success">{flash}</Alert>}
+      {warning && (
+        <Alert tone="warning" title="تنبيه الميزانية">
+          {warning} <Link to="/budgets">عرض الميزانيات</Link>
+        </Alert>
+      )}
 
       {transactions.length === 0 ? (
         <EmptyState

@@ -1,5 +1,6 @@
 import { Dexie, type EntityTable } from 'dexie'
 import type { Account } from '../domain/accounts'
+import type { Budget } from '../domain/budgets'
 import type { Category } from '../domain/categories'
 import type { Transaction } from '../domain/transactions'
 
@@ -20,6 +21,7 @@ export class QirshDB extends Dexie {
   accounts!: EntityTable<Account, 'id'>
   transactions!: EntityTable<Transaction, 'id'>
   categories!: EntityTable<Category, 'id'>
+  budgets!: EntityTable<Budget, 'id'>
 
   constructor(name = 'qirsh') {
     super(name)
@@ -44,6 +46,11 @@ export class QirshDB extends Dexie {
     this.version(3).stores({
       categories: 'id, kind',
       transactions: 'id, date, accountId, type, categoryId',
+    })
+
+    // الإصدار 4 (المرحلة 5): جدول الميزانيات.
+    this.version(4).stores({
+      budgets: 'id, categoryId, currency',
     })
   }
 }

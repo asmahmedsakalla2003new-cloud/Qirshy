@@ -9,7 +9,11 @@ import { TextField } from '../../components/TextField'
 import { listAccounts } from '../../data/accountsRepo'
 import { listCategories } from '../../data/categoriesRepo'
 import { ValidationError } from '../../data/errors'
-import { createTransaction, getTransaction, updateTransaction } from '../../data/transactionsRepo'
+import { listBudgets } from '../../data/budgetsRepo'
+import { createTransaction, getTransaction, listTransactions, updateTransaction } from '../../data/transactionsRepo'
+import { levelCrossings } from '../../domain/budgets'
+import { currentMonth } from '../../domain/months'
+import { alertMessage, budgetLabel } from '../budgets/budgetLabels'
 import type { Account } from '../../domain/accounts'
 import type { Category } from '../../domain/categories'
 import { todayISO } from '../../domain/dates'
@@ -53,6 +57,22 @@ export function TransactionFormScreen() {
       transaction={transaction ?? undefined}
     />
   )
+}
+
+/**
+ * تنبيه فوري إذا رفعت العملية المحفوظة ميزانيةً من هذا الشهر إلى مستوى «اقتراب» أو «حد».
+ * للشهر الحالي فقط، حتى لا تزعج تعديلات العمليات القديمة.
+ */
+async function budgetWarning(date: string, before: Awaited<ReturnType<typeof listTransactions>>) {
+  const month = currentMonth()
+  if (!date.startsWith(month)) return undefined
+  const [budgets, after, categories] = await Promise.all([listBudgets(), listTransactions(), listCategories()])
+  const crossings = levelCrossings(budgets, month, before, after)
+  if (crossings.length === 0) return undefined
+  const names = new Map(categories.map((c) => [c.id, c.name]))
+  return crossings
+    .map(({ budget, level }) => alertMessage(level, budgetLabel(budget, names.get(budget.categoryId ?? ''))))
+    .join(' ')
 }
 
 type FormProps = { accounts: Account[]; categories: Category[]; transaction?: Transaction }
@@ -107,12 +127,16 @@ function TransactionForm({ accounts, categories, transaction }: FormProps) {
 
     setSaving(true)
     try {
+      const before = await listTransactions()
+      if (transaction) await updateTransaction(transaction.id, input)
+      else await createTransaction(input)
+      const warning = await budgetWarning(input.date, before)
+
       if (transaction) {
-        await updateTransaction(transaction.id, input)
-        navigate(`/transactions/${transaction.id}`, { replace: true, state: { flash: 'حُفظت التعديلات.' } })
+        navigate(`/transactions/${transaction.id}`, { replace: true, state: { flash: 'حُفظت التعديلات.', warning } })
       } else {
-        await createTransaction(input)
-        navigate('/transactions', { replace: true, state: { flash: type === 'income' ? 'أُضيف الدخل.' : 'أُضيف المصروف.' } })
+        const flash = type === 'income' ? 'أُضيف الدخل.' : 'أُضيف المصروف.'
+        navigate('/transactions', { replace: true, state: { flash, warning } })
       }
     } catch (err) {
       if (err instanceof ValidationError) setErrors(err.errors)
