@@ -13,3 +13,7 @@ export function countLabel(n: number, forms: CountForms): string {
 
 export const accountForms: CountForms = { one: 'حساب واحد', two: 'حسابان', few: 'حسابات', many: 'حساباً' }
 export const transactionForms: CountForms = { one: 'عملية واحدة', two: 'عمليتان', few: 'عمليات', many: 'عملية' }
+export const transferForms: CountForms = { one: 'تحويل واحد', two: 'تحويلان', few: 'تحويلات', many: 'تحويلاً' }
+export const categoryForms: CountForms = { one: 'فئة واحدة', two: 'فئتان', few: 'فئات', many: 'فئة' }
+export const budgetForms: CountForms = { one: 'ميزانية واحدة', two: 'ميزانيتان', few: 'ميزانيات', many: 'ميزانية' }
+export const debtForms: CountForms = { one: 'دين واحد', two: 'دينان', few: 'ديون', many: 'ديناً' }

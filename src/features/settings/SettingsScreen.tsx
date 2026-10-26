@@ -1,7 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { Alert } from '../../components/Alert'
 import { Card } from '../../components/Card'
 import { Icon } from '../../components/Icon'
 import { listAccounts } from '../../data/accountsRepo'
@@ -84,7 +83,9 @@ export function SettingsScreen() {
         {storage?.persisted === false && (
           <p className="muted small">لزيادة الحماية، ثبّت قِرْش على الشاشة الرئيسية من قائمة المتصفح.</p>
         )}
-        <Alert tone="info">إنشاء نسخة احتياطية واستعادتها سيتوفران في تحديث قادم.</Alert>
+        <Link to="/settings/backup" className="btn btn--primary btn--md btn--full">
+          النسخ الاحتياطي والاستعادة
+        </Link>
       </Card>
 
       <p className="dev-link">

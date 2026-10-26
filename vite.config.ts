@@ -1,8 +1,13 @@
+import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
 
+const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }
+
 export default defineConfig({
+  // رقم إصدار التطبيق، يُسجَّل في ملف النسخة الاحتياطية.
+  define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [
     react(),
     VitePWA({

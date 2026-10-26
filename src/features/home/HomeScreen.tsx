@@ -1,5 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link, useSearchParams } from 'react-router'
+import { Alert } from '../../components/Alert'
+import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { CurrencySummaryCard } from '../../components/CurrencySummaryCard'
 import { EmptyState } from '../../components/EmptyState'
@@ -11,9 +13,11 @@ import { listAccounts } from '../../data/accountsRepo'
 import { listBudgets } from '../../data/budgetsRepo'
 import { listDebtPayments, listDebts } from '../../data/debtsRepo'
 import { listCategories } from '../../data/categoriesRepo'
+import { getSettings, snoozeBackupReminder } from '../../data/settingsRepo'
 import { listTransactions } from '../../data/transactionsRepo'
 import { listTransfers } from '../../data/transfersRepo'
 import { accountBalance } from '../../domain/accounts'
+import { shouldRemindBackup } from '../../domain/backup'
 import { categoryBreakdown } from '../../domain/categories'
 import { debtStatus } from '../../domain/debts'
 import { CURRENCIES, currencyLabels } from '../../domain/money'
@@ -32,6 +36,7 @@ export function HomeScreen() {
   const transfers = useLiveQuery(listTransfers)
   const debts = useLiveQuery(listDebts)
   const debtPayments = useLiveQuery(listDebtPayments)
+  const settings = useLiveQuery(getSettings)
   const [params, setParams] = useSearchParams()
 
   const thisMonth = currentMonth()
@@ -39,7 +44,7 @@ export function HomeScreen() {
   const month = /^\d{4}-\d{2}$/.test(requested) && requested <= thisMonth ? requested : thisMonth
   const { from, to } = monthRange(month)
 
-  if (!transactions || !accounts || !categories || !budgets || !transfers || !debts || !debtPayments) return null
+  if (!transactions || !accounts || !categories || !budgets || !transfers || !debts || !debtPayments || !settings) return null
 
   const names = Object.fromEntries([...accounts, ...categories].map((x) => [x.id, x.name]))
 
@@ -112,6 +117,24 @@ export function HomeScreen() {
   return (
     <div className="stack">
       <h1 className="page-title page-title--flush">الرئيسية</h1>
+
+      {shouldRemindBackup(settings, transactions.length + transfers.length) && (
+        <Alert tone="info" title="احفظ نسخة احتياطية">
+          <p>
+            {settings.lastBackupAt
+              ? 'مرّ أكثر من شهر على آخر نسخة احتياطية.'
+              : 'بياناتك محفوظة في هذا المتصفح فقط، ولم تُنشأ نسخة احتياطية بعد.'}
+          </p>
+          <div className="alert__actions">
+            <Link to="/settings/backup" className="btn btn--secondary btn--md">
+              إنشاء نسخة الآن
+            </Link>
+            <Button variant="ghost" onClick={() => snoozeBackupReminder()}>
+              لاحقاً
+            </Button>
+          </div>
+        </Alert>
+      )}
 
       <BudgetAlerts
         budgets={budgets}

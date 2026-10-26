@@ -18,6 +18,7 @@ import { DebtsScreen } from '../features/debts/DebtsScreen'
 import { TransferDetailScreen } from '../features/transfers/TransferDetailScreen'
 import { TransferFormScreen } from '../features/transfers/TransferFormScreen'
 import { ReportsScreen } from '../features/reports/ReportsScreen'
+import { BackupScreen } from '../features/backup/BackupScreen'
 import { AppLayout } from './AppLayout'
 import { RequireOnboarding, WelcomeRoute } from './guards'
 
@@ -50,6 +51,7 @@ export const routes: RouteObject[] = [
       { path: 'settings/accounts', element: <AccountsScreen /> },
       { path: 'settings/accounts/new', element: <AccountFormScreen /> },
       { path: 'settings/accounts/:id', element: <AccountFormScreen /> },
+      { path: 'settings/backup', element: <BackupScreen /> },
       { path: 'settings/categories', element: <CategoriesScreen /> },
       { path: 'settings/categories/new', element: <CategoryFormScreen /> },
       { path: 'settings/categories/:id', element: <CategoryFormScreen /> },

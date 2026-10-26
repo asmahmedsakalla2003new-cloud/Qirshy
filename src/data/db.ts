@@ -15,6 +15,8 @@ export type AppSettings = {
   lastBackupAt: string | null
   /** true بعد إنشاء الفئات الافتراضية مرة واحدة (حتى لا تعود إذا حذفها المستخدم). */
   categoriesSeeded?: boolean
+  /** تأجيل تذكير النسخ الاحتياطي حتى هذا الوقت. */
+  backupReminderSnoozedUntil?: string
   createdAt: string
 }
 
