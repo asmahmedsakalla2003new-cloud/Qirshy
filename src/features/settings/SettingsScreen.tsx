@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import { Card } from '../../components/Card'
 import { Icon } from '../../components/Icon'
 import { listAccounts } from '../../data/accountsRepo'
-import { getSettings } from '../../data/settingsRepo'
+import { getSettings, setAutoSaveReceipts } from '../../data/settingsRepo'
 import { getStorageStatus, type StorageStatus } from '../../data/storage'
 import { accountForms, countLabel } from '../../domain/arabic'
 import { formatDateTime } from '../../domain/dates'
@@ -13,6 +13,30 @@ function persistedLabel(status: StorageStatus | undefined): string {
   if (!status) return '…'
   if (status.persisted === null) return 'غير مدعومة في هذا المتصفح'
   return status.persisted ? 'مفعّلة' : 'غير مفعّلة بعد'
+}
+
+/** يستجيب فوراً للنقر ثم يحفظ (القراءة من قاعدة البيانات غير متزامنة فترتد الخانة لحظة). */
+function AutoSaveToggle({ initial }: { initial: boolean }) {
+  const [checked, setChecked] = useState(initial)
+  return (
+    <label className="toggle">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => {
+          setChecked(e.target.checked)
+          void setAutoSaveReceipts(e.target.checked)
+        }}
+      />
+      <span>
+        <span className="toggle__title">حفظ تلقائي عند وضوح القراءة</span>
+        <span className="toggle__hint">
+          يُحفظ المصروف دون شاشة المراجعة فقط إذا قُرئ المبلغ بجانب «الإجمالي» والتاريخ كاملاً دون أي تحذير. غير ذلك
+          تظهر المراجعة دائماً.
+        </span>
+      </span>
+    </label>
+  )
 }
 
 export function SettingsScreen() {
@@ -56,6 +80,21 @@ export function SettingsScreen() {
           </span>
           <Icon name="chevron" size={18} />
         </Link>
+      </Card>
+
+      <Card>
+        <h2 className="section-title">قراءة الفواتير</h2>
+        <Link to="/scan" className="list-item list-item--plain">
+          <span className="list-item__icon">
+            <Icon name="camera" />
+          </span>
+          <span className="list-item__main">
+            <span className="list-item__title">تصوير فاتورة</span>
+            <span className="list-item__meta">تُقرأ على جهازك فقط، والصورة لا تُرسل ولا تُحفظ</span>
+          </span>
+          <Icon name="chevron" size={18} />
+        </Link>
+        {settings && <AutoSaveToggle initial={!!settings.autoSaveReceipts} />}
       </Card>
 
       <Card>

@@ -845,3 +845,39 @@ a {
 .filename {
   overflow-wrap: anywhere;
 }
+
+/* ===== قراءة الفواتير ===== */
+.receipt-preview img {
+  display: block;
+  inline-size: 100%;
+  max-block-size: 50vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.reading progress {
+  inline-size: 100%;
+  accent-color: var(--color-primary);
+}
+
+.receipt-items {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+
+.receipt-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.receipt-items__sum {
+  padding-block-start: var(--space-1);
+  border-block-start: 1px solid var(--color-border);
+  font-weight: var(--font-weight-semibold);
+}

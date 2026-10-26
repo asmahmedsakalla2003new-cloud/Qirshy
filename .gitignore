@@ -26,3 +26,6 @@ dist-ssr
 # Playwright
 test-results
 playwright-report
+
+# ملفات قراءة الفواتير تُنسخ من node_modules عند البناء
+public/ocr

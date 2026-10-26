@@ -19,6 +19,7 @@ import { TransferDetailScreen } from '../features/transfers/TransferDetailScreen
 import { TransferFormScreen } from '../features/transfers/TransferFormScreen'
 import { ReportsScreen } from '../features/reports/ReportsScreen'
 import { BackupScreen } from '../features/backup/BackupScreen'
+import { ScanScreen } from '../features/receipts/ScanScreen'
 import { AppLayout } from './AppLayout'
 import { RequireOnboarding, WelcomeRoute } from './guards'
 
@@ -34,6 +35,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomeScreen /> },
       { path: 'transactions', element: <TransactionsScreen /> },
       { path: 'transactions/new', element: <TransactionFormScreen /> },
+      { path: 'scan', element: <ScanScreen /> },
       { path: 'transactions/:id', element: <TransactionDetailScreen /> },
       { path: 'transactions/:id/edit', element: <TransactionFormScreen /> },
       { path: 'transfers/new', element: <TransferFormScreen /> },

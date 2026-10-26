@@ -10,6 +10,10 @@ export async function snoozeBackupReminder(days = 7): Promise<void> {
   await db.settings.update('app', { backupReminderSnoozedUntil: until })
 }
 
+export async function setAutoSaveReceipts(enabled: boolean): Promise<void> {
+  await db.settings.update('app', { autoSaveReceipts: enabled })
+}
+
 export async function completeOnboarding(): Promise<void> {
   await db.settings.update('app', { onboardedAt: new Date().toISOString() })
   // بعد ضغطة المستخدم مباشرةً، حين يكون طلب الحماية من الحذف التلقائي مفهوماً.

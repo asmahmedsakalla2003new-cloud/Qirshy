@@ -35,6 +35,17 @@ export default defineConfig({
       workbox: {
         // تخزين كل ملفات التطبيق مسبقاً (بما فيها الخط) ليعمل دون إنترنت.
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // ملفات قراءة الفواتير كبيرة (~9 ميغابايت): لا تُحمَّل مع التطبيق،
+        // بل عند أول استخدام، ثم تُحفظ لتعمل دون إنترنت.
+        globIgnores: ['ocr/**'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/ocr/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'qirsh-ocr', expiration: { maxEntries: 10 } },
+          },
+        ],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: '/index.html',
       },
     }),

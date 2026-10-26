@@ -1,23 +1,24 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router'
 import { Alert } from '../../components/Alert'
 import { Button } from '../../components/Button'
 import { ChoiceGroup } from '../../components/ChoiceGroup'
 import { EmptyState } from '../../components/EmptyState'
+import { Icon } from '../../components/Icon'
 import { TextField } from '../../components/TextField'
 import { listAccounts } from '../../data/accountsRepo'
+import { listBudgets } from '../../data/budgetsRepo'
 import { listCategories } from '../../data/categoriesRepo'
 import { ValidationError } from '../../data/errors'
-import { listBudgets } from '../../data/budgetsRepo'
 import { createTransaction, getTransaction, listTransactions, updateTransaction } from '../../data/transactionsRepo'
-import { levelCrossings } from '../../domain/budgets'
-import { currentMonth } from '../../domain/months'
-import { alertMessage, budgetLabel } from '../budgets/budgetLabels'
 import type { Account } from '../../domain/accounts'
+import { levelCrossings } from '../../domain/budgets'
 import type { Category } from '../../domain/categories'
 import { todayISO } from '../../domain/dates'
-import { currencyLabels, parseAmount, toInputValue, currencySymbols } from '../../domain/money'
+import { currencyLabels, currencySymbols, parseAmount, toInputValue } from '../../domain/money'
+import { currentMonth } from '../../domain/months'
+import type { ReceiptData } from '../../domain/receipt'
 import {
   DESCRIPTION_MAX,
   TRANSACTION_TYPES,
@@ -27,8 +28,12 @@ import {
   type TransactionErrors,
   type TransactionType,
 } from '../../domain/transactions'
+import { alertMessage, budgetLabel } from '../budgets/budgetLabels'
+import { receiptToInput } from '../receipts/prefill'
+import { ReceiptReview } from '../receipts/ReceiptReview'
 
 const typeOptions = TRANSACTION_TYPES.map((value) => ({ value, label: transactionTypeLabels[value] }))
+
 /** /transactions/new?type=expense لإضافة عملية، و /transactions/:id/edit لتعديلها. */
 export function TransactionFormScreen() {
   const { id } = useParams()
@@ -78,15 +83,21 @@ type FormProps = { accounts: Account[]; categories: Category[]; transaction?: Tr
 function TransactionForm({ accounts, categories, transaction }: FormProps) {
   const navigate = useNavigate()
   const [params] = useSearchParams()
+  const location = useLocation()
   const isEdit = !!transaction
+  // بيانات فاتورة مقروءة من شاشة «قراءة فاتورة» تملأ النموذج للمراجعة.
+  const [receipt] = useState(() => (isEdit ? undefined : (location.state as { receipt?: ReceiptData } | null)?.receipt))
+  const prefill = receipt ? receiptToInput(receipt, accounts, categories) : undefined
 
   const initialType: TransactionType = transaction?.type ?? (params.get('type') === 'income' ? 'income' : 'expense')
   const [type, setType] = useState<TransactionType>(initialType)
-  const [amount, setAmount] = useState(transaction ? toInputValue(transaction.amountMinor) : '')
-  const [accountId, setAccountId] = useState(transaction?.accountId ?? accounts[0]?.id ?? '')
-  const [categoryId, setCategoryId] = useState(transaction?.categoryId ?? '')
-  const [date, setDate] = useState(transaction?.date ?? todayISO())
-  const [description, setDescription] = useState(transaction?.description ?? '')
+  const [amount, setAmount] = useState(
+    transaction ? toInputValue(transaction.amountMinor) : prefill?.amountMinor ? toInputValue(prefill.amountMinor) : '',
+  )
+  const [accountId, setAccountId] = useState(transaction?.accountId ?? prefill?.accountId ?? accounts[0]?.id ?? '')
+  const [categoryId, setCategoryId] = useState(transaction?.categoryId ?? prefill?.categoryId ?? '')
+  const [date, setDate] = useState(transaction?.date ?? prefill?.date ?? todayISO())
+  const [description, setDescription] = useState(transaction?.description ?? prefill?.description ?? '')
   const [errors, setErrors] = useState<TransactionErrors>({})
   const [formError, setFormError] = useState<string>()
   const [saving, setSaving] = useState(false)
@@ -133,7 +144,7 @@ function TransactionForm({ accounts, categories, transaction }: FormProps) {
       if (transaction) {
         navigate(`/transactions/${transaction.id}`, { replace: true, state: { flash: 'حُفظت التعديلات.', warning } })
       } else {
-        const flash = type === 'income' ? 'أُضيف الدخل.' : 'أُضيف المصروف.'
+        const flash = receipt ? 'أُضيف المصروف من الفاتورة.' : type === 'income' ? 'أُضيف الدخل.' : 'أُضيف المصروف.'
         navigate('/transactions', { replace: true, state: { flash, warning } })
       }
     } catch (err) {
@@ -153,6 +164,13 @@ function TransactionForm({ accounts, categories, transaction }: FormProps) {
       <h1 className="page-title">{title}</h1>
 
       {formError && <Alert tone="danger">{formError}</Alert>}
+      {receipt && <ReceiptReview receipt={receipt} accountCurrency={account?.currency} />}
+      {!isEdit && !receipt && type === 'expense' && (
+        <Link to="/scan" className="btn btn--secondary btn--md btn--full">
+          <Icon name="camera" size={20} />
+          قراءة من صورة فاتورة
+        </Link>
+      )}
 
       <ChoiceGroup legend="نوع العملية" options={typeOptions} value={type} onChange={changeType} />
 

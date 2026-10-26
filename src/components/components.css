@@ -302,3 +302,31 @@
   gap: var(--space-2);
   margin-block-start: var(--space-3);
 }
+
+/* ===== مفتاح تشغيل (خانة اختيار مع عنوان وشرح) ===== */
+.toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-block-start: var(--space-3);
+  cursor: pointer;
+}
+
+.toggle input {
+  flex: none;
+  inline-size: 22px;
+  block-size: 22px;
+  margin-block-start: 3px;
+  accent-color: var(--color-primary);
+}
+
+.toggle__title {
+  display: block;
+  font-weight: var(--font-weight-semibold);
+}
+
+.toggle__hint {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}

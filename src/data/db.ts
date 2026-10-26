@@ -17,6 +17,8 @@ export type AppSettings = {
   categoriesSeeded?: boolean
   /** تأجيل تذكير النسخ الاحتياطي حتى هذا الوقت. */
   backupReminderSnoozedUntil?: string
+  /** حفظ الفاتورة مباشرة دون مراجعة عند قراءة واضحة تماماً (معطّل افتراضياً). */
+  autoSaveReceipts?: boolean
   createdAt: string
 }
 

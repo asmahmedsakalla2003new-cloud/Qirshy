@@ -92,6 +92,9 @@ export function HomeScreen() {
               <Link to="/transfers/new" className="btn btn--secondary btn--md">
                 تحويل
               </Link>
+              <Link to="/scan" className="btn btn--secondary btn--md">
+                تصوير فاتورة
+              </Link>
             </div>
           }
         />
@@ -157,6 +160,10 @@ export function HomeScreen() {
           تحويل
         </Link>
       </div>
+      <Link to="/scan" className="btn btn--secondary btn--md btn--full">
+        <Icon name="camera" size={20} />
+        تصوير فاتورة
+      </Link>
 
       <section className="stack stack--tight" aria-labelledby="balances-title">
         <h2 id="balances-title" className="section-title">
