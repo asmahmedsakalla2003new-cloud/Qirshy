@@ -1,7 +1,7 @@
 {
   "name": "qirsh",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "ocr-assets": "node scripts/copy-ocr-assets.mjs",
@@ -44,5 +44,8 @@
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.0.5",
     "workbox-window": "^7.4.1"
+  },
+  "engines": {
+    "node": ">=22.12"
   }
 }

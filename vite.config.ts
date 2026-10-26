@@ -1,15 +1,41 @@
 import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-import { defineConfig } from 'vitest/config'
+import { defineConfig, type Plugin } from 'vitest/config'
 
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }
+
+/**
+ * سياسة أمان المحتوى (CSP) لنسخة الإنتاج فقط: لا سكربتات أو اتصالات إلا من التطبيق نفسه.
+ * 'wasm-unsafe-eval' لازم لمحرك قراءة الفواتير (WebAssembly). نسخة التطوير بلا CSP
+ * لأن Vite يحقن فيها سكربتات مضمّنة.
+ */
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'wasm-unsafe-eval'",
+  "worker-src 'self' blob:",
+  "style-src 'self'",
+  "img-src 'self' blob: data:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "manifest-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ')
+
+const csp: Plugin = {
+  name: 'qirsh-csp',
+  apply: 'build',
+  transformIndexHtml: () => [{ tag: 'meta', attrs: { 'http-equiv': 'Content-Security-Policy', content: CSP }, injectTo: 'head-prepend' }],
+}
 
 export default defineConfig({
   // رقم إصدار التطبيق، يُسجَّل في ملف النسخة الاحتياطية.
   define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [
     react(),
+    csp,
     VitePWA({
       // يُحدَّث التطبيق تلقائياً عند توفر نسخة جديدة؛ البيانات محلية فلا تتأثر بالتحديث.
       registerType: 'autoUpdate',

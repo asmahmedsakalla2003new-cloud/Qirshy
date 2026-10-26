@@ -45,8 +45,10 @@ test('التنقل السفلي يعمل ويبدأ من اليمين', async ({
 
 test('صفحة نظام التصميم تُعرض دون تجاوز عرض الشاشة', async ({ page }) => {
   await finishOnboarding(page)
-  await page.getByRole('link', { name: 'الإعدادات' }).click()
-  await page.getByRole('link', { name: 'معاينة نظام التصميم' }).click()
+  // الرابط مخفي في نسخة الإنتاج، والصفحة متاحة بعنوانها.
+  await page.goto('/settings')
+  await expect(page.getByRole('link', { name: 'معاينة نظام التصميم' })).toHaveCount(0)
+  await page.goto('/design')
   await expect(page.getByRole('heading', { level: 1, name: 'نظام التصميم' })).toBeVisible()
   await expectNoHorizontalOverflow(page)
 })

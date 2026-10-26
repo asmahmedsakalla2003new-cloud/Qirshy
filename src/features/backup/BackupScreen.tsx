@@ -21,6 +21,8 @@ import {
 import { formatDateTime } from '../../domain/dates'
 
 const MIME = 'application/json'
+/** حد أعلى لحجم ملف الاستعادة؛ النسخ الحقيقية أصغر بكثير، والملفات الضخمة قد تجمّد الهاتف. */
+const MAX_BACKUP_BYTES = 50 * 1024 * 1024
 
 /** هل يدعم المتصفح مشاركة الملفات (مثل الحفظ في Google Drive من الهاتف)؟ */
 function canShareFiles(): boolean {
@@ -85,6 +87,10 @@ export function BackupScreen() {
     const selected = e.target.files?.[0]
     e.target.value = '' // للسماح باختيار الملف نفسه مرة أخرى.
     if (!selected) return
+    if (selected.size > MAX_BACKUP_BYTES) {
+      setRestore({ step: 'error', message: 'الملف كبير جداً ولا يبدو نسخة احتياطية من قِرْش.' })
+      return
+    }
     setRestore({ step: 'checking' })
     try {
       const file = await readBackupText(await selected.text())

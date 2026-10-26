@@ -127,9 +127,12 @@ export function SettingsScreen() {
         </Link>
       </Card>
 
-      <p className="dev-link">
-        <Link to="/design">معاينة نظام التصميم</Link>
-      </p>
+      {/* للمطوّر فقط؛ الصفحة نفسها تبقى متاحة على /design. */}
+      {import.meta.env.DEV && (
+        <p className="dev-link">
+          <Link to="/design">معاينة نظام التصميم</Link>
+        </p>
+      )}
     </div>
   )
 }
